@@ -1,0 +1,21 @@
+{
+  "name": "paker",
+  "version": "1.0.0",
+  "description": "KIWI's Paker",
+  "main": "app.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://haoranzhang@bitbucket.org/kiwikiwikiwi/paker.git"
+  },
+  "keywords": [
+    "keywords"
+  ],
+  "author": "haoranzhang",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.10.6"
+  }
+}
