@@ -4,29 +4,35 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-
-var routes = require('./routes/index');
-var users = require('./routes/users');
+var passport = require('./passport');
+var session = require('express-session');
+var routers = require('./routers');
 
 var app = express();
 
-// view engine setup
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(__dirname + '/public/favicon.ico'));
 app.use(logger('dev'));
 app.use(bodyParser.json());
+app.use(cookieParser('securedsession'));
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
+app.use(session({
+  secret: 'securedsession',
+  resave: false,
+  saveUninitialized: true,
+  }));
+app.use(passport.initialize()); // Add passport initialization
+app.use(passport.session()); // Add passport initialization
 
 // error handlers
 
 // development error handler
 // will print stacktrace
 if (app.get('env') === 'development') {
-		app.use(express.static(path.join(__dirname, '../client')));
-		app.use(express.static(path.join(__dirname, '../client/.tmp')));
-		app.use(express.static(path.join(__dirname, '../client/app')));
+    app.use(express.static(path.join(__dirname, '../client')));
+    app.use(express.static(path.join(__dirname, '../client/.tmp')));
+    app.use(express.static(path.join(__dirname, '../client/app')));
     app.use(function(err, req, res, next) {
         res.status(err.status || 500);
         res.render('error', {
@@ -39,7 +45,7 @@ if (app.get('env') === 'development') {
 // production error handler
 // no stacktraces leaked to user
 app.use(function(err, req, res, next) {
-		app.use(express.static(path.join(__dirname, 'dist/')));
+    app.use(express.static(path.join(__dirname, 'dist/')));
     res.status(err.status || 500);
     res.render('error', {
         message: err.message,
@@ -47,12 +53,13 @@ app.use(function(err, req, res, next) {
     });
 });
 
+app.use(routers);
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
     var err = new Error('Not Found');
     err.status = 404;
     next(err);
 });
-
 
 module.exports = app;

@@ -7,11 +7,7 @@
  * # AboutCtrl
  * Controller of the clientApp
  */
-angular.module('clientApp')
-  .controller('AboutCtrl', function ($scope) {
-    $scope.awesomeThings = [
-      'HTML5 Boilerplate',
-      'AngularJS',
-      'Karma'
-    ];
-  });
+angular.module('aboutControllers', [])
+  .controller('AboutCtrl', ['$scope', function ($scope) {
+		$scope.hello = 'hello';
+  }]);

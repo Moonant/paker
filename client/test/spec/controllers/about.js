@@ -1,22 +1,19 @@
 'use strict';
 
-describe('Controller: AboutCtrl', function () {
-
+describe('module aboutControllers', function () {
   // load the controller's module
-  beforeEach(module('clientApp'));
+  beforeEach(module('aboutControllers'));
 
-  var AboutCtrl,
-    scope;
+  describe('AboutCtrl controller', function() {
+    var scope, ctrl;
+    beforeEach(inject(function($rootScope, $controller){
+      scope = $rootScope.$new();
+      ctrl = $controller('AboutCtrl', {$scope: scope});
+    }));
 
-  // Initialize the controller and a mock scope
-  beforeEach(inject(function ($controller, $rootScope) {
-    scope = $rootScope.$new();
-    AboutCtrl = $controller('AboutCtrl', {
-      $scope: scope
+    it('AboutCtrl should be work', function(){
+      expect(scope.hello).toBe('hello');
     });
-  }));
-
-  it('should attach a list of awesomeThings to the scope', function () {
-    expect(scope.awesomeThings.length).toBe(3);
   });
+
 });

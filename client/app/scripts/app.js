@@ -10,24 +10,57 @@
  */
 angular
   .module('clientApp', [
-    'ngAnimate',
-    'ngAria',
     'ngCookies',
-    'ngMessages',
     'ngResource',
     'ngRoute',
-    'ngSanitize',
-    'ngTouch'
+    'loginControllers',
+    'mainControllers',
+    'aboutControllers'
   ])
-  .config(function ($routeProvider) {
+  .config(['$locationProvider', '$httpProvider', '$routeProvider',
+  function ($locationProvider, $httpProvider, $routeProvider) {
+    var checkLoggedin = function($q, $timeout, $http, $location, $rootScope){
+      var deferred = $q.defer();
+
+      $http.get('/loggedin').success(function(user){
+        if(user !== '0')
+          $timeout(deferred.resolve, 0);
+        else {
+          $rootScope.message = 'You need to log in';
+          $timeout(function(){
+            deferred.reject();
+          }, 0);
+          $location.url('/login');
+        }
+      });
+
+      return deferred.promise;
+    };
+
+    $httpProvider.interceptors.push(function($q, $location) {
+      return function(promise) {
+        return promise.then(
+        function(response){
+          return response;
+        },
+        function(response) {
+          if(response.status === 401)
+            $location.url('/login');
+        });
+      };
+    });
+
     $routeProvider
       .when('/', {
         templateUrl: 'views/main.html',
-        controller: 'MainCtrl'
+        controller: 'MainCtrl',
+        resolve: {
+          loggedin: checkLoggedin
+        }
       })
-      .when('/about', {
-        templateUrl: 'views/about.html',
-        controller: 'AboutCtrl'
+      .when('/login', {
+        templateUrl: 'views/login.html',
+        controller: 'LoginCtrl'
       })
       .when('/about', {
         templateUrl: 'views/about.html',
@@ -36,4 +69,11 @@ angular
       .otherwise({
         redirectTo: '/'
       });
+  }])
+  .run(function($rootScope, $http){
+    $rootScope.message = '';
+    $rootScope.logout = function(){
+      $rootScope.message = 'Logged out';
+      $http.post('/logout');
+    };
   });

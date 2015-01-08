@@ -7,11 +7,7 @@
  * # MainCtrl
  * Controller of the clientApp
  */
-angular.module('clientApp')
+angular.module('mainControllers', [])
   .controller('MainCtrl', function ($scope) {
-    $scope.awesomeThings = [
-      'HTML5 Boilerplate',
-      'AngularJS',
-      'Karma'
-    ];
+    $scope.hello = 'hello';
   });

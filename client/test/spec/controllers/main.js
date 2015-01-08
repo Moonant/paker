@@ -1,22 +1,20 @@
 'use strict';
 
-describe('Controller: MainCtrl', function () {
+describe('mainControllers', function () {
 
   // load the controller's module
-  beforeEach(module('clientApp'));
+  beforeEach(module('mainControllers'));
 
-  var MainCtrl,
-    scope;
+  describe('MainCtrl', function(){
+    var scope, ctrl;
+    beforeEach(inject(function($rootScope, $controller){
+      scope = $rootScope.$new();
+      ctrl = $controller('MainCtrl', {$scope: scope});
+    }));
 
-  // Initialize the controller and a mock scope
-  beforeEach(inject(function ($controller, $rootScope) {
-    scope = $rootScope.$new();
-    MainCtrl = $controller('MainCtrl', {
-      $scope: scope
+    it('MainCtrl should work', function(){
+      expect(scope.hello).toBe('hello');
     });
-  }));
-
-  it('should attach a list of awesomeThings to the scope', function () {
-    expect(scope.awesomeThings.length).toBe(3);
   });
+
 });

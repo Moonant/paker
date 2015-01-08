@@ -1,0 +1,18 @@
+'use strict'
+
+describe('loginControllers', function(){
+  beforeEach(module('loginControllers'));
+
+  describe('LoginCtrl', function(){
+    var scope, ctrl;
+    beforeEach(inject(function($rootScope, $controller){
+      scope = $rootScope.$new();
+      ctrl = $controller('LoginCtrl', {$scope: scope});
+    }));
+
+    it('LoginCtrl should work', function(){
+      expect(scope.hello).toBe('helloo');
+    });
+  });
+
+});

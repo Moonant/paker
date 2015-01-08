@@ -1,1 +1,21 @@
-@import "bootstrap";
+$icon-font-path: "../bower_components/bootstrap-sass-official/assets/fonts/bootstrap/";
+// bower:scss
+@import "bootstrap-sass-official/assets/stylesheets/_bootstrap.scss";
+// endbower
+
+.jumbotron {
+  padding-top: 200px;
+}
+
+#blank {
+  height: 200px;
+}
+
+a.navbar-brand {
+  font-weight: bold;
+  font-size: 25px;
+}
+
+body {
+  font-family: "Microsoft YaHei", "Arial", "Verdana", "Tahoma";
+}
