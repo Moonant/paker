@@ -15,7 +15,8 @@ angular
     'ngRoute',
     'loginControllers',
     'mainControllers',
-    'aboutControllers'
+    'aboutControllers',
+    'loginDirectives'
   ])
   .config(['$locationProvider', '$httpProvider', '$routeProvider',
   function ($locationProvider, $httpProvider, $routeProvider) {
