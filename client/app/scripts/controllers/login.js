@@ -42,8 +42,10 @@ RegisterDialogCtrl.$inject = ['$scope'];
 
 function Jeff(){
   return {
+    //templateUrl: 'views/navbar-right-login.html'
     templateUrl: function(elem, attr){
-      return 'views/main.html';
+      console.log(attr.type);
+      return 'views/navbar-right-login.html';
     }
   };
 }

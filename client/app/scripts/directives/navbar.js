@@ -10,8 +10,11 @@ navbarDirectives.directive('navbar', function() {
   };
 });
 navbarDirectives.directive('conditionalRightNavbar', function() {
+  function link(scope, element, attrs){
+    console.dir(attrs);
+  }
   return {
-    restrict: 'A'
-    //link: link
+    restrict: 'A',
+    link: link
   };
 });
