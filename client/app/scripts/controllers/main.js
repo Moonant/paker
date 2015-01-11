@@ -7,7 +7,11 @@
  * # MainCtrl
  * Controller of the clientApp
  */
+function MainCtrl($scope, $location){
+  $scope.hello = 'hello';
+  $scope.current = $location.path();
+}
+MainCtrl.$inject = ['$scope','$location'];
+
 angular.module('mainControllers', [])
-  .controller('MainCtrl', function ($scope) {
-    $scope.hello = 'hello';
-  });
+  .controller('MainCtrl', MainCtrl);

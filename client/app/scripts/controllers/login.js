@@ -7,41 +7,49 @@
  * # LoginCtrl
  * Controller of the clientApp
  */
-var loginControllers = angular.module('loginControllers', ['authenticationServices']);
 
-loginControllers.controller('LoginCtrl', 
-  ['$scope', 
-   '$http', 
-   '$rootScope', 
-   '$location',
-   'Auth',
-   function ($scope, $http, $rootScope, $location, Auth) {
-     $scope.hello = 'helloo';
-     $scope.user = {};
-     $scope.login = function(){
-       var user = new Auth();
-       user.username = $scope.user.username;
-       user.password = $scope.user.password;
-       user.$login();
-       $location.url('/main');
-     };
-     $scope.register = function(){
-     };
-   }
-  ]);
+function LoginCtrl($scope, $rootScope, $location, Auth) {
+  $scope.hello = 'helloo';
+  $scope.user = {};
+  //$scope.current = $location.path();
+  $scope.login = function(){
+    var user = new Auth();
+    user.username = $scope.user.username;
+    user.password = $scope.user.password;
+    user.$login();
+    $location.url('/main');
+  };
+  $scope.register = function(){
+  };
+}
+LoginCtrl.$inject = ['$scope', '$rootScope', '$location', 'Auth'];
 
-loginControllers.controller('RegisterDialogCtrl',
-  ['$scope',
-   function($scope){
-      this.registerForm = {};
-      this.registerForm.username = '';
-      this.registerForm.password = '';
-      this.register = function() {
-        var invalid = this.registerForm.username === ''||
-          this.registerForm.password === '';
-        if(invalid)
-          return;
-        console.log('fun ');
-      };
-   }
-  ]);
+function RegisterDialogCtrl($scope){
+  $scope.hello = 'helloo';
+  this.registerForm = {};
+  this.registerForm.username = '';
+  this.registerForm.password = '';
+  this.register = function() {
+    var invalid = this.registerForm.username === ''||
+      this.registerForm.password === '';
+    if(invalid) {
+      return;
+    }
+    console.log('fun ');
+  };
+}
+RegisterDialogCtrl.$inject = ['$scope'];
+
+function Jeff(){
+  return {
+    templateUrl: function(elem, attr){
+      return 'views/main.html';
+    }
+  };
+}
+
+angular
+  .module('loginControllers', ['authenticationServices'])
+  .controller('LoginCtrl', LoginCtrl)
+  .controller('RegisterDialogCtrl', RegisterDialogCtrl)
+  .directive('jeff', Jeff);

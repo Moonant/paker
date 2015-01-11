@@ -1,0 +1,10 @@
+<form ng-submit="login()" name="loginForm" class="navbar-form navbar-right">
+  <div class="form-group" ng-class="{ 'has-error': loginForm.sername.$invalid && login.username.$dirty}">
+    <input placeholder="用户名" name="sername" ng-model="user.username" class="form-control" type="text"></input>
+  </div>
+  <div class="form-group" ng-class="{ 'has-error': loginForm.password.$invalid && login.password.$dirty}">
+    <input placeholder="密码" class="form-control" name="password" ng-model="user.password" type="password"></input>
+  </div>
+  <button id="login_btn" type="submit" class="btn btn-success">登陆</button>
+  <button id="register_btn" type="button" class="btn btn-primary" data-toggle="modal" data-target="#registerModal" data-whatever="@mdo">注册</button>
+</form>

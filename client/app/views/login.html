@@ -1,29 +1,4 @@
-<nav class="navbar navbar-inverse navbar-fixed-top">
-  <div class="container">
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-        <span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-      <a class="navbar-brand" href="#/">Packer</a>
-    </div>
-    <div id="navbar" class="navbar-collapse collapse">
-      <form ng-submit="login()" name="loginForm" class="navbar-form navbar-right">
-        <div class="form-group" ng-class="{ 'has-error': loginForm.sername.$invalid && login.username.$dirty}">
-          <input placeholder="用户名" name="sername" ng-model="user.username" class="form-control" type="text"></input>
-        </div>
-        <div class="form-group" ng-class="{ 'has-error': loginForm.password.$invalid && login.password.$dirty}">
-          <input placeholder="密码" class="form-control" name="password" ng-model="user.password" type="password"></input>
-        </div>
-        <button id="login_btn" type="submit" class="btn btn-success">登陆</button>
-        <button id="register_btn" type="button" class="btn btn-primary" data-toggle="modal" data-target="#registerModal" data-whatever="@mdo">注册</button>
-      </form>
-    </div><!--/.navbar-collapse -->
-  </div>
-</nav>
-
+<navbar></navbar>
 <register-dialog></register-dialog>
 
 <!-- Main jumbotron -->
@@ -33,8 +8,8 @@
     <p>智能排课系统</p>
   </div>
 </div>
-<div id="blank" class="container">
-  <footer>
+<footer class="footer">
+  <div class="container">
     <p>KIWI © 2014</p>
-  </footer>
-</div> <!-- /container -->
+  </div>
+</footer>
