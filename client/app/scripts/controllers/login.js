@@ -7,29 +7,25 @@
  * # LoginCtrl
  * Controller of the clientApp
  */
-var loginControllers = angular.module('loginControllers', []);
+var loginControllers = angular.module('loginControllers', ['authenticationServices']);
 
 loginControllers.controller('LoginCtrl', 
   ['$scope', 
    '$http', 
    '$rootScope', 
    '$location',
-   function ($scope, $http, $rootScope, $location) {
+   'Auth',
+   function ($scope, $http, $rootScope, $location, Auth) {
      $scope.hello = 'helloo';
      $scope.user = {};
      $scope.login = function(){
-       $http.post('/login', {
-         username: $scope.user.username,
-         password: $scope.user.password,
-       })
-       .success(function(user){
-         $rootScope.message = 'authentication successful';
-         $location.url('/main');
-       });
+       var user = new Auth();
+       user.username = $scope.user.username;
+       user.password = $scope.user.password;
+       user.$login();
+       $location.url('/main');
      };
      $scope.register = function(){
-       $http.post('/register', {
-       });
      };
    }
   ]);

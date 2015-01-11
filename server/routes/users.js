@@ -11,7 +11,7 @@ var auth = function(req, res, next){
 };
 
 // main page router
-router.get('/', auth, function(req, res){
+router.get('/user', auth, function(req, res){
   res.send([{name: "user1"}, {name: "user2"}]);
 });
 
