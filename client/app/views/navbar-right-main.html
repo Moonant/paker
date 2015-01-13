@@ -1,7 +1,40 @@
 <ul class="nav navbar-nav navbar-right">
-  <li><a href="#">账户</a></li>
-  <li><a href="#">帮助</a></li>
+  <li><a data-toggle="modal" data-target="#import-div" href="">导入</a></li>
+  <li><a href="">导出</a></li>
+  <li class="dropdown">
+    <a class="dropdown-toggle" aria-expanded="true" id="dropdownMenu" data-toggle="dropdown" href="">账户</a>
+    <ul class="dropdown-menu" role="menu" aria-lablledby="dropdownMenu">
+      <li role="dropdown-menu"><a role="menuitem" tabindex="-1" href="#">个人信息</a></li>
+      <li role="dropdown-menu"><a role="menuitem" tabindex="-1" href="#">安全设置</a></li>
+      <li role="dropdown-menu"><a role="menuitem" tabindex="-1" href="" ng-click="logout()">退出</a></li>
+    </ul>
+  </li>
 </ul>
+
 <form class="navbar-form navbar-right">
   <input class="form-control" placeholder="搜索..." type="text">
 </form>
+
+<div id="import-div" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="exampleModalLabel">导入课程</h4>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="form-group">
+            <label for="exampleInputFile">文件导入</label>
+            <input type="file" id="exampleInputFile">
+            <p class="help-block">请上传符合要求的excel文件</p>
+          </div>
+        </form>
+      </div><!-- .modal-body -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+        <button type="button" class="btn btn-primary">导入</button>
+      </div>
+    </div><!-- .modal-content -->
+  </div><!-- .modal-dialog -->
+</div>

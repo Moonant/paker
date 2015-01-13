@@ -12,10 +12,3 @@ loginDirectives.directive('registerDialog', function() {
   };
 });
 
-function ConditionalRightNavbar() {
-  return {
-    restrict: 'A',
-    templateUrl: 'views/navbar-right-login.html'
-  };
-}
-loginDirectives.directive('conditionalRightNavbar', ConditionalRightNavbar);

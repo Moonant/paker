@@ -9,7 +9,7 @@ function AuthenticationInterceptor($q, $location){
     response: function() {
     },
     responseError: function(response){
-      //console.log('Authentication check: ' + response.status);
+      console.log('Authentication check: ' + response.status);
       $location.url('/login');
     }
   };
@@ -22,11 +22,14 @@ AuthenticationInterceptor.$inject = ['$q', '$location'];
 
 function Auth($resource, authenticationInterceptor){
   var options = {
-    login: {method: 'POST', params: {verb: 'login'}, isArray: false},
+    login: {method: 'POST', params: {verb: 'login'}},
     logout: {method: 'POST', params: {verb: 'logout'}},
+    register: {method: 'POST', params: {verb: 'register'}, isArray: false},
     check: {
-      method: 'GET', params: {verb: ''},
-      interceptor: authenticationInterceptor, isArray: true
+      method: 'GET',
+      params: {verb: ''},
+      interceptor: authenticationInterceptor,
+      isArray: true
     }
   };
   return $resource('/user/:verb', {verb: 'login'}, options);

@@ -9,12 +9,19 @@ navbarDirectives.directive('navbar', function() {
     templateUrl: 'views/navbar-div.html'
   };
 });
-navbarDirectives.directive('conditionalRightNavbar', function() {
-  function link(scope, element, attrs){
-    console.dir(attrs);
-  }
+
+function ConditionalRightNavbar($location) {
   return {
     restrict: 'A',
-    link: link
+    templateUrl: function(){
+      var current = $location.path();
+      var patt = new RegExp('login');
+      if(patt.test(current)){
+        return 'views/navbar-right-login.html';
+      }
+      return 'views/navbar-right-main.html';
+    }
   };
-});
+}
+ConditionalRightNavbar.$inject = ['$location'];
+navbarDirectives.directive('conditionalRightNavbar', ConditionalRightNavbar);

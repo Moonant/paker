@@ -34,14 +34,10 @@ function ModuleConfig($locationProvider, $httpProvider, $routeProvider) {
 }
 ModuleConfig.$inject = ['$locationProvider' ,'$httpProvider' ,'$routeProvider'];
 
-function ModuleRun($rootScope, $http){
+function ModuleRun($rootScope){
   $rootScope.message = '';
-  $rootScope.logout = function(){
-    $rootScope.message = 'Logged out';
-    $http.post('/logout');
-  };
 }
-ModuleRun.$inject = ['$rootScope', '$http'];
+ModuleRun.$inject = ['$rootScope'];
 
 angular
   .module('clientApp', [

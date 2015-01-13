@@ -51,9 +51,14 @@ body {
   margin-bottom: 20px;
   margin-left: -20px;
 }
+
 .nav-sidebar > li > a {
   padding-right: 20px;
   padding-left: 20px;
+}
+
+.nav-sidebar > li > .sub-element {
+	padding-left: 40px;
 }
 .nav-sidebar > .active > a,
 .nav-sidebar > .active > a:hover,
@@ -99,3 +104,13 @@ body {
   display: inline-block;
   border-radius: 50%;
 }
+
+.dropdown {
+	display: inline-block;
+}
+
+#dropdownMenu {
+	padding-top: 15px;
+	padding-bottom: 15px;
+}
+

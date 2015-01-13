@@ -7,11 +7,14 @@
  * # MainCtrl
  * Controller of the clientApp
  */
-function MainCtrl($scope, $location){
+function MainCtrl($scope, $location, Auth){
   $scope.hello = 'hello';
-  $scope.current = $location.path();
+  $scope.logout = function(){
+    Auth.logout();
+    $location.url('/login');
+  };
 }
-MainCtrl.$inject = ['$scope','$location'];
+MainCtrl.$inject = ['$scope', '$location', 'Auth'];
 
-angular.module('mainControllers', [])
+angular.module('mainControllers', ['authenticationServices'])
   .controller('MainCtrl', MainCtrl);
