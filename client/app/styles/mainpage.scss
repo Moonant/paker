@@ -57,9 +57,22 @@ body {
   padding-left: 20px;
 }
 
-.nav-sidebar > li > .sub-element {
+.nav-sidebar > li > ul > li > a {
 	padding-left: 40px;
 }
+
+.nav-sidebar > li > ul > li > ul > li > a {
+	padding-left: 60px;
+}
+
+.nav-sidebar > li > ul > li > ul > li > ul > li > a {
+	padding-left: 80px;
+}
+
+.nav-sidebar > li > .sub-sub-element {
+	padding-left: 60px;
+}
+
 .nav-sidebar > .active > a,
 .nav-sidebar > .active > a:hover,
 .nav-sidebar > .active > a:focus {
@@ -67,7 +80,18 @@ body {
   background-color: #428bca;
 }
 
+.nav-close {
+  display: none;
+}
 
+a:hover > .nav-close {
+  display: inline-block;
+  width: 20px;
+}
+
+.grade {
+  display: inline-block;
+}
 /*
  * Main content
  */
@@ -114,3 +138,38 @@ body {
 	padding-bottom: 15px;
 }
 
+.course {
+  text-align: center;
+  padding: 0;
+  border-width: 1px 1px 0 1px;
+  margin: 10px;
+}
+
+.course-container {
+  padding: 0;
+}
+
+.list-group {
+  margin: 0;
+  padding: 0;
+}
+
+.list-group-item {
+  border-width: 1px 0;
+}
+
+.list-group-item:first-child {
+  border-width: 1px 0;
+  border-top-right-radius: 0;
+  border-top-left-radius: 0;
+}
+
+button.course-delete {
+  padding: 4px 10px 4px 4px;
+}
+
+.course-name {
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}

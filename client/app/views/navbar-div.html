@@ -1,3 +1,7 @@
+<!-- navbar for both loginpage and mainpage -->
+<!-- attached by directive navbar.js/navbar to login.html -->
+<!-- controllers: depends -->
+
 <nav class="navbar navbar-inverse navbar-fixed-top">
   <div class="container-fluid">
     <div class="navbar-header">
@@ -9,6 +13,7 @@
       </button>
       <a class="navbar-brand" href="#/">Packer</a>
     </div>
+    <!-- different depend on the route -->
     <div conditional-right-navbar type="login" id="navbar" class="navbar-collapse collapse">
     </div><!--/.navbar-collapse -->
   </div>

@@ -2,14 +2,6 @@
 
 // Directives for navbar
 
-var navbarDirectives = angular.module('navbarDirectives', ['loginControllers']);
-navbarDirectives.directive('navbar', function() {
-  return {
-    restrict: 'E',
-    templateUrl: 'views/navbar-div.html'
-  };
-});
-
 function ConditionalRightNavbar($location) {
   return {
     restrict: 'A',
@@ -24,4 +16,11 @@ function ConditionalRightNavbar($location) {
   };
 }
 ConditionalRightNavbar.$inject = ['$location'];
-navbarDirectives.directive('conditionalRightNavbar', ConditionalRightNavbar);
+angular.module('navbarDirectives', ['loginControllers'])
+  .directive('conditionalRightNavbar', ConditionalRightNavbar)
+  .directive('navbar', function() {
+    return {
+      restrict: 'E',
+      templateUrl: 'views/navbar-div.html'
+    };
+  });

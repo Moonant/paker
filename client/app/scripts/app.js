@@ -11,12 +11,22 @@
 
 function ModuleConfig($locationProvider, $httpProvider, $routeProvider) {
   $routeProvider
-    .when('/', {
+    .when('/main', {
       templateUrl: 'views/main.html',
       controller: 'MainCtrl',
       resolve: {
         loggedin: function(Auth){
           return Auth.check();
+        }
+      }
+    })
+    .when('/', {
+      resolve: {
+        loggedin: function(Auth, $location){
+          Auth.check(function() {
+            $location.url('/main');
+          });
+          return;
         }
       }
     })
@@ -49,7 +59,8 @@ angular
     'aboutControllers',
     'loginDirectives',
     'navbarDirectives',
-    'authenticationServices'
+    'authenticationServices',
+    'ui.bootstrap'
   ])
   .config(ModuleConfig)
   .run(ModuleRun);

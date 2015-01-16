@@ -7,6 +7,10 @@ var bodyParser = require('body-parser');
 var passport = require('./passport');
 var session = require('express-session');
 var user = require('./routes/users.js');
+var course = require('./routes/course.js');
+var apartment = require('./routes/apartment.js');
+var teacher = require('./routes/teacher.js');
+var grade = require('./routes/grade.js');
 
 var app = express();
 
@@ -58,6 +62,10 @@ if (app.get('env') === 'production') {
 }
 
 app.use(user);
+app.use(course);
+app.use(apartment);
+app.use(teacher);
+app.use(grade);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

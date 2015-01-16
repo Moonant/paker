@@ -3,11 +3,11 @@ var LocalStrategy = require('passport-local');
 var mongoose = require('mongoose');
 var User = require('./classes/user');
 
-//==================================================================
+//=============================================
 // Define the strategy to be used by PassportJS
 passport.use(new LocalStrategy(
   function(username, password, done) {
-    var connStr = 'mongodb://localhost:27017/users';
+    var connStr = 'mongodb://localhost:27017/packer';
     mongoose.connect(connStr, function(err) {
       if(err) throw err;
     });
