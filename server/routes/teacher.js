@@ -1,7 +1,7 @@
 var express = require('express');
 var passport = require('../passport');
 var mongoose = require('mongoose');
-var Teacher = require('../classes/teacher');
+var Teacher = require('../models/teacher');
 var router = express.Router();
 
 // Define a middleware function to be used for every secured routes

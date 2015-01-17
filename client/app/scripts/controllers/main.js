@@ -392,21 +392,33 @@ UploadDialogCtrl.$inject = ['$scope', '$modalInstance'];
 
 // Controller for add course dialog
 function AddCourseDialogCtrl($scope, $modalInstance, Apartment, 
-  apartments, teachers, grades) {
+  apartments, teachers, grades, Course) {
 
+  // data required, should resolve in enclosing scope
   $scope.grades = grades;
-  $scope.teachers = teachers;
   $scope.apartments = apartments;
-  $scope.teacherId = null;
+  $scope.teachers = teachers;
+
+  // 1st section
+  $scope.courseName = '';
   $scope.selectedApartment = {};
   $scope.selectedMajor = {};
   $scope.selectedGrade = {};
-  $scope.selectedClasses = [];
-  $scope.isReadonly = false;
+
+  // 2nd section 
+  $scope.lectureHours = '';
+  $scope.onlineHours = '';
+  $scope.intermHours = '';
+
+  // 3rd  section
+  $scope.labHours = '';
+  $scope.extracurricular = '';
+  $scope.totalHours = '';
+
+  // 4th section 
   $scope.tipHide = false;
   // select the grade specified classes 
   $scope.$watch('selectedGrade', function() {
-    console.log('changed');
     var filt = function(cls) {
       if(cls.grade === undefined) { return false; }
       return cls.grade._id === $scope.selectedGrade._id;
@@ -416,6 +428,77 @@ function AddCourseDialogCtrl($scope, $modalInstance, Apartment,
       $scope.tipHide = true;
     }
   });
+
+  // 5th section 
+  $scope.teacherId = null;
+  $scope.teacherName = '';
+  $scope.isReadonly = false;
+
+  // 6th section
+  $scope.startweek = '';
+  $scope.endweek = '';
+  $scope.weekSecs = [];
+  $scope.addWeekSec = function() {
+    // start week and end week not blank
+    if($scope.startweek === '' || $scope.endweek === '') { return; }
+    var name = $scope.startweek + '周至' + $scope.endweek + '周';
+    $scope.weekSecs.push({
+      startweek: $scope.startweek,
+      endweek: $scope.endweek,
+      name: name 
+    });
+  };
+
+  // 7th seciton
+  $scope.weekdays = [
+    { _id: 0, name: '星期天'},
+    { _id: 1, name: '星期一'},
+    { _id: 2, name: '星期二'},
+    { _id: 3, name: '星期三'},
+    { _id: 4, name: '星期四'},
+    { _id: 5, name: '星期五'},
+    { _id: 6, name: '星期六'}
+  ];
+  $scope.positions = [
+    { _id: 0, name: '第1,2节'},
+    { _id: 1, name: '第3,4节'},
+    { _id: 2, name: '第5,6节'},
+    { _id: 3, name: '第7,8节'},
+    { _id: 4, name: '第9,10节'},
+    { _id: 5, name: '第11,12节'}
+  ];
+  $scope.times = [];
+  $scope.weekday = {};
+  $scope.position = {};
+  $scope.addTime = function() {
+    if($scope.weekday.name === undefined || $scope.position.name === {}) {
+      return; 
+    }
+    var name = $scope.weekday.name + $scope.position.name;
+    $scope.times.push({
+      weekday: $scope.weekday,
+      position: $scope.position,
+      name: name
+    });
+  };
+
+  // 8th section 
+  $scope.isCompulsory = false;
+  $scope.selectedCategory = {};
+  $scope.selectedCom = {};
+  $scope.comOpts = [
+    { _id: '0', name: '选修' },
+    { _id: '1', name: '必修' }
+  ];
+  $scope.categories = [
+    { _id: 0, name: '通识教育课程' },
+    { _id: 1, name: '学科基础教程' }
+  ];
+  $scope.changeIsCompulsory = function() {
+    if($scope.selectedCom._id+'' === '0') { $scope.isCompulsory = false; }
+    else { $scope.isCompulsory = true; }
+  };
+
   $scope.$watch('teacherId', function() {
     var filt = function(item) {
       return item._id === parseInt($scope.teacherId);
@@ -434,9 +517,79 @@ function AddCourseDialogCtrl($scope, $modalInstance, Apartment,
     $modalInstance.dismiss('cancel');
     //console.dir($scope.selectedApartment);
   };
+
+  $scope.addCourse = function() {
+    //console.log($scope.courseName);//
+    //console.dir($scope.selectedApartment);//
+    //console.dir($scope.selectedMajor);//
+    //console.dir($scope.selectedGrade);//
+    //console.log($scope.lectureHours);//
+    //console.log($scope.onlineHours);
+    //console.log($scope.intermHours + ';' + $scope.labHours + 
+    //  $scope.extracurricular + $scope.totalHours);
+    //console.dir($scope.classes);//
+    //console.log($scope.teacherName+$scope.teacherId);//
+    //console.dir($scope.weekSecs);//
+    //console.dir($scope.times);//
+    //console.log($scope.isCompulsory);//
+    //console.dir($scope.selectedCategory);
+    var course = new Course();
+    course.name = $scope.courseName;
+    course.apartment = {};
+    course.apartment._id = $scope.selectedApartment._id;
+    course.apartment.name = $scope.selectedApartment.name;
+    course.major = {};
+    course.major._id = $scope.selectedMajor._id;
+    course.major.name = $scope.selectedMajor.name;
+    course.grade = {};
+    course.grade._id = $scope.selectedGrade._id;
+    course.grade.name = $scope.selectedGrade.name;
+    course.lectureHours = $scope.lectureHours;
+    course.onlineHours = $scope.onlineHours;
+    course.intermHours = $scope.intermHours;
+    course.labHours = $scope.labHours;
+    course.extracurricular = $scope.extracurricular;
+    course.totalHours = $scope.totalHours;
+
+    // fiter to filt the selected classes
+    var filt = function(cls) {
+      if(cls.isSelected === undefined) { return false; }
+      return cls.isSelected;
+    };
+    if($scope.classes !== undefined) {
+      course.classes = $scope.classes.filter(filt);
+    }
+    course.teacher = {};
+    course.teacher._id = $scope.teacherId;
+    course.teacher.name = $scope.teacherName;
+    course.arrange = {};
+    course.arrange.weeks = [];
+    course.arrange.timeNPlace = [];
+
+    // push week number into course.arrange.weeks 
+    // according to the weekSecs
+    $scope.weekSecs.forEach(function(weekSec) {
+      var start = parseInt(weekSec.startweek);
+      var end = parseInt(weekSec.endweek);
+      for(var i=start; i<=end; i++) {
+        course.arrange.weeks.push(i);
+      }
+    });
+    // push time into timeNPlace
+    $scope.times.forEach(function(time) {
+      course.arrange.timeNPlace.push(time);
+    });
+    course.isCompulsory = $scope.isCompulsory;
+    course.category = $scope.selectedCategory;
+    course.$save();
+    $modalInstance.close();
+  };
+  $scope.cancel = function() {
+    $modalInstance.dismiss('cancel');
+  };
 }
 AddCourseDialogCtrl.$inject = ['$scope', '$modalInstance', 'Apartment',
-  'apartments', 'teachers', 'grades'];
+  'apartments', 'teachers', 'grades', 'Course'];
 
 // Controller for add apartment dialog
 function AddApartmentDialogCtrl($scope, $modalInstance) {
@@ -529,7 +682,7 @@ function AddTeacherDialogCtrl($scope, $modalInstance, apartments) {
 AddTeacherDialogCtrl.$inject = ['$scope', '$modalInstance', 'apartments'];
 
 var dependences = ['authenticationServices', 'apartmentServices',
-  'teacherServices'];
+  'teacherServices', 'courseServices'];
 angular.module('mainControllers', dependences)
   .controller('MainCtrl', MainCtrl)
   .controller('ConfirmDialogCtrl', ConfirmDialogCtrl)

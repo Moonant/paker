@@ -2,7 +2,7 @@ var express = require('express');
 var passport = require('../passport');
 var mongoose = require('mongoose');
 var MongoClient = require('mongodb');
-var Apartment = require('../classes/apartment');
+var Apartment = require('../models/apartment');
 var router = express.Router();
 
 // Define a middleware function to be used for every secured routes
@@ -42,7 +42,7 @@ router.post('/apartments/:aptid/majors/:mjid/classes', auth, function(req, res) 
     var majors = doc.majors;
     // filter for mjid specified majors  
     var filt = function(major) {
-      console.dir(major._id + ':' + mjid);
+      //console.dir(major._id + ':' + mjid);
       return major._id == mjid;
     };
     majors.filter(filt)[0].classes.push(newClass);

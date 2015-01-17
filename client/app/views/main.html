@@ -134,7 +134,7 @@
     <form ng-submit="ok()">
       <div class="form-group">
         <label class="control-label" >请输入院系名称:</font></label>
-        <input type="text" class="form-control" ng-model="apartmentName"></input>
+        <input type="text" ng-required class="form-control" ng-model="apartmentName"></input>
       </div>
     </form>
   </div>
@@ -155,7 +155,7 @@
     <form ng-submit="ok()">
       <div class="form-group">
         <label class="control-label" >请输入专业名称:</font></label>
-        <input type="text" class="form-control" ng-model="majorName"></input>
+        <input type="text" ng-required class="form-control" ng-model="majorName"></input>
       </div>
     </form>
   </div>
@@ -176,9 +176,9 @@
     <form ng-submit="ok()">
       <div class="form-group">
         <label class="control-label" >请输入班级名称:</label>
-        <input type="text" class="form-control" ng-model="className"></input>
+        <input type="text" ng-required class="form-control" ng-model="className"></input>
         <label class="control-label" >年级:</label>
-        <select type="text" ng-options="grade as grade.name for grade in grades" class="form-control" ng-model="selectedGrade"></select>
+        <select type="text" ng-required ng-options="grade as grade.name for grade in grades" class="form-control" ng-model="selectedGrade"></select>
       </div>
     </form>
   </div>
@@ -199,11 +199,11 @@
     <form ng-submit="ok()">
       <div class="form-group">
         <label class="control-label">所属院系:</label>
-        <select ng-model="apartment" ng-options="apartment as apartment.name for apartment in apartments" class="form-control"></select>
+        <select ng-model="apartment" ng-required ng-options="apartment as apartment.name for apartment in apartments" class="form-control"></select>
       </di>
       <div class="form-group">
         <label class="control-label" >请输入教师姓名:</label>
-        <input type="text" class="form-control" ng-model="teacherName"></input>
+        <input type="text" class="form-control" ng-required ng-model="teacherName"></input>
       </div>
     </form>
   </div>

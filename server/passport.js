@@ -1,7 +1,7 @@
 var passport = require('passport');
 var LocalStrategy = require('passport-local');
 var mongoose = require('mongoose');
-var User = require('./classes/user');
+var User = require('./models/user');
 
 //=============================================
 // Define the strategy to be used by PassportJS
