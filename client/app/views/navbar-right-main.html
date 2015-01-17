@@ -56,22 +56,35 @@
 
   <div class="modal-body">
     <form>
-      <div class="form-group">
-        <label class="control-label" >课程名称:</font></label>
-        <input type="text" ng-required class="form-control" ng-model="courseName"></input>
-      </div>
       <div class="row form-group">
         <div class="col-sm-3">
+          <label class="control-label">课程名称:</label>
+          <input type="text" class="form-control"></input>
+        </div>
+        <div class="col-sm-3">
           <label class="control-label">院系:</label>
-          <select type="text" ng-options="apartment as apartment.name for apartment in apartments" class="form-control" ng-model="selectedApartment"></select>
+          <select ng-options="apartment as apartment.name for apartment in apartments" class="form-control" ng-model="selectedApartment"></select>
         </div>
         <div class="col-sm-3">
           <label class="control-label">专业:</label>
-          <select type="password" class="form-control" ng-options="major as major.name for major in selectedApartment.majors" ng-model="selectedMajor"></select>
+          <select class="form-control" ng-options="major as major.name for major in selectedApartment.majors" ng-model="selectedMajor"></select>
         </div>
         <div class="col-sm-3">
+          <label class="control-label">年级:</label>
+          <select ng-options="grade as grade.name for grade in grades" ng-change="selectClasses()" class="form-control" ng-model="selectedGrade"></select>
+        </div>
+      </div>
+      <hr/>
+      <div class="row form-group">
+        <div class="col-sm-9">
+          <label class="control-label">可选班级:<span class="tips" ng-hide="tipHide">请选择院系专业年级</span></label>
+          <label class="btn btn-default" ng-repeat="class in classes" ng-model="class.isSelected" btn-checkbox>{{ class.name }}</label>
+        </div>
+      </div>
+      <div class="row form-group">
+        <div class="col-sm-3">
           <label class="control-label">教师代号:</label>
-          <input type="text" class="col-sm-3 form-control" ng-model="teacherId"></input>
+          <input type="text" class="form-control" ng-model="teacherId"></input>
         </div>
         <div class="col-sm-3">
           <label class="control-label">教师姓名:</label>
@@ -80,19 +93,81 @@
       </div>
       <div class="form-group">
       </div>
+      <div class="form-group">
+        <label class="control-label">周数:</label>
+        <p ng-repeat="weekSec in weeksSecs"> {{ weekSec.describe }} </p>
+      </div>
       <div class="row form-group">
-        <div class="col-sm-3">
-          <label class="control-label">年级:</label>
-          <select type="text" ng-options="grade as grade.name for grade in grades" ng-change="selectClasses()" class="form-control" ng-model="selectedGrade"></select>
-        </div>
-        <div class="col-sm-9">
-          <label class="control-label">班级:</label><br/>
-          <label class="btn btn-primary" ng-repeat="class in classes" ng-model="class.isSelected" btn-checkbox>{{ class.name }}</label>
-        </div>
+        <form>
+          <div class="col-sm-3">
+            <label class="control-label">开始周数:</label>
+            <input type="text" class="form-control" ng-model="startweek"></input>
+          </div>
+          <div class="col-sm-3">
+            <label class="control-label">结束周数:</label>
+            <input type="text" class="form-control" ng-model="endweek"></input>
+          </div>
+          <div class="col-sm-3">
+            <label class="control-label">确定添加: </label>
+            <button type="text" class="btn btn-default">添加</button>
+          </div>
+        </form>
       </div>
       <div class="form-group">
-        <label for="classrome-input" class="control-label">时间:</label>
-        <input type="password" name="classrome-input" class="form-control" ng-model="classrome"></input>
+        <label class="control-label">周数:</label>
+        <p ng-repeat="weekSec in weeksSecs"> {{ weekSec.describe }} </p>
+      </div>
+      <div class="row form-group">
+        <form>
+          <div class="col-sm-3">
+            <label class="control-label">星期:</label>
+            <select type="text" class="form-control" ng-model="startweek"></select>
+          </div>
+          <div class="col-sm-3">
+            <label class="control-label">节次:</label>
+            <select type="text" class="form-control" ng-model="endweek"></select>
+          </div>
+          <div class="col-sm-3">
+            <label class="control-label">确定添加: </label>
+            <button type="text" class="btn btn-default">添加</button>
+          </div>
+        </form>
+      </div>
+      <div class="form-group row">
+        <div class="col-sm-3">
+          <label class="control-label">课程性质:</label>
+          <select class="form-control"></select>
+        </div>
+        <div class="col-sm-3">
+          <label class="control-label">课程类别:</label>
+          <select class="form-control"></select>
+        </div>
+      </div>
+      <div class="form-group row">
+        <div class="col-sm-2">
+          <label class="control-label">课程总学时:</label>
+          <input class="form-control"></input>
+        </div>
+        <div class="col-sm-2">
+          <label class="control-label">讲课学时:</label>
+          <input class="form-control"></input>
+        </div>
+        <div class="col-sm-2">
+          <label class="control-label">上机学时:</label>
+          <input class="form-control"></input>
+        </div>
+        <div class="col-sm-2">
+          <label class="control-label">实验学时:</label>
+          <input class="form-control"></input>
+        </div>
+        <div class="col-sm-2">
+          <label class="control-label">课外学时:</label>
+          <input class="form-control"></input>
+        </div>
+        <div class="col-sm-2">
+          <label class="control-label">本学期总学时:</label>
+          <input class="form-control"></input>
+        </div>
       </div>
     </form>
     <!-- alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.msg}}</alert -->

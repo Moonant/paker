@@ -16,7 +16,7 @@ var classSchema = new Schema({
   }
 });
 
-//classSchema.plugin(autoIncrement.plugin, 'Class');
+classSchema.plugin(autoIncrement.plugin, 'Class');
 
 var majorSchema = new Schema({
   _id: { type: Number },

@@ -403,6 +403,7 @@ function AddCourseDialogCtrl($scope, $modalInstance, Apartment,
   $scope.selectedGrade = {};
   $scope.selectedClasses = [];
   $scope.isReadonly = false;
+  $scope.tipHide = false;
   // select the grade specified classes 
   $scope.$watch('selectedGrade', function() {
     console.log('changed');
@@ -412,6 +413,7 @@ function AddCourseDialogCtrl($scope, $modalInstance, Apartment,
     };
     if($scope.selectedMajor.classes) {
       $scope.classes = $scope.selectedMajor.classes.filter(filt);
+      $scope.tipHide = true;
     }
   });
   $scope.$watch('teacherId', function() {

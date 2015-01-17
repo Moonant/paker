@@ -36,15 +36,23 @@ router.post('/apartments/:aptid/majors/:mjid/classes', auth, function(req, res) 
   mongoose.connect(connStr, function(err) {
     if(err) console.log(err);
   });
-  var callback = function(err) {
-    if(err) console.log(err);
+  
+  // callback for the find operation
+  var docCallback = function(err, doc) {
+    var majors = doc.majors;
+    // filter for mjid specified majors  
+    var filt = function(major) {
+      console.dir(major._id + ':' + mjid);
+      return major._id == mjid;
+    };
+    majors.filter(filt)[0].classes.push(newClass);
+    doc.save();
     mongoose.connection.close();
   };
-  Apartment.update(
-    { _id: aptid, 'majors._id': mjid },
-    { $push: { 'majors.$.classes': newClass }},
-    callback
-  );
+
+  Apartment.findOne({ _id: aptid })
+    .where('majors._id').equals(mjid)
+    .exec(docCallback);
   res.end();
 });
 
