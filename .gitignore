@@ -3,4 +3,7 @@ node_modules/
 .idea/
 /server/dist/
 /alg/
+bower_components/
+/client/.sass-cache/
+/npm-debug.log
 
