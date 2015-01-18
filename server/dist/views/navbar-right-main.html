@@ -1,1 +1,172 @@
-<ul class="nav navbar-nav navbar-right"> <li><a data-toggle="modal" data-target="#import-div" href="">导入</a></li> <li><a href="">导出</a></li> <li class="dropdown"> <a class="dropdown-toggle" aria-expanded="true" id="dropdownMenu" data-toggle="dropdown" href="">账户</a> <ul class="dropdown-menu" role="menu" aria-lablledby="dropdownMenu"> <li role="dropdown-menu"><a role="menuitem" tabindex="-1" href="#">个人信息</a></li> <li role="dropdown-menu"><a role="menuitem" tabindex="-1" href="#">安全设置</a></li> <li role="dropdown-menu"><a role="menuitem" tabindex="-1" href="" ng-click="logout()">退出</a></li> </ul> </li> </ul> <form class="navbar-form navbar-right"> <input class="form-control" placeholder="搜索..." type="text"> </form> <div id="import-div" class="modal fade" tabindex="-1" role="dialog"> <div class="modal-dialog modal-lg"> <div class="modal-content"> <div class="modal-header"> <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button> <h4 class="modal-title" id="exampleModalLabel">导入课程</h4> </div> <div class="modal-body"> <form> <div class="form-group"> <label for="exampleInputFile">文件导入</label> <input type="file" id="exampleInputFile"> <p class="help-block">请上传符合要求的excel文件</p> </div> </form> </div><!-- .modal-body --> <div class="modal-footer"> <button type="button" class="btn btn-default" data-dismiss="modal">取消</button> <button type="button" class="btn btn-primary">导入</button> </div> </div><!-- .modal-content --> </div><!-- .modal-dialog --> </div>
+<!-- right-side of navbar if route if '/main' --><!-- attached by directive nvabar.js/conditionalRightNavbar to navbar-div.html --><!-- controllers: MainCtrl --> <ul class="nav navbar-nav navbar-right"> <li><a ng-click="addGradeDialog()" href="">增加年级</a></li> <li><a ng-click="addCourseDialog()" href="">增加课程</a></li> <li><a ng-click="uploadExcelDialog()" href="">导入</a></li> <li><a href="">导出</a></li> <li class="dropdown"> <a class="dropdown-toggle" aria-expanded="true" id="dropdownMenu" data-toggle="dropdown" href="">{{ user.username }}</a> <ul class="dropdown-menu" role="menu" aria-lablledby="dropdownMenu"> <li role="dropdown-menu"><a role="menuitem" tabindex="-1" href="#">个人信息</a></li> <li role="dropdown-menu"><a role="menuitem" tabindex="-1" href="#">安全设置</a></li> <li role="dropdown-menu"><a role="menuitem" tabindex="-1" href="" ng-click="logout()">退出</a></li> </ul> </li> </ul> <form class="navbar-form navbar-right"> <input class="form-control" placeholder="搜索..." type="text"> </form> <!-- excelUploadDialog --> <script type="text/ng-template" id="uploadDialog.html"><div class="modal-header">
+    <button type="button" class="close"  ng-click="cancel()" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    <h4 class="modal-title">导入课程</h4>
+  </div>
+
+  <!-- dialog body -->
+  <div class="modal-body">
+    <form>
+      <div class="form-group">
+        <label for="excelFileInput">文件导入</label>
+        <input type="file" id="excelFileInput">
+        <p class="help-block">请上传符合要求的excel文件</p>
+      </div><!-- form-group -->
+    </form>
+  </div>
+
+  <!-- Dialog footer -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-default" ng-click="cancel()">取消</button>
+    <button type="button" class="btn btn-primary">导入</button>
+  </div></script> <!-- add course dialog --> <script type="text/ng-template" id="addCourseDialog.html"><div class="modal-header">
+    <button type="button" class="close" ng-click="cancel()" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    <h4 class="modal-title">增加课程</h4>
+  </div><!-- modal-header -->
+
+  <div class="modal-body">
+    <form>
+      <div class="row form-group">
+        <div class="col-sm-3">
+          <label class="control-label">课程名称:</label>
+          <input type="text" class="form-control"></input>
+        </div>
+        <div class="col-sm-3">
+          <label class="control-label">院系:</label>
+          <select ng-options="apartment as apartment.name for apartment in apartments" class="form-control" ng-model="selectedApartment"></select>
+        </div>
+        <div class="col-sm-3">
+          <label class="control-label">专业:</label>
+          <select class="form-control" ng-options="major as major.name for major in selectedApartment.majors" ng-model="selectedMajor"></select>
+        </div>
+        <div class="col-sm-3">
+          <label class="control-label">年级:</label>
+          <select ng-options="grade as grade.name for grade in grades" ng-change="selectClasses()" class="form-control" ng-model="selectedGrade"></select>
+        </div>
+      </div>
+      <hr/>
+      <div class="row form-group">
+        <div class="col-sm-9">
+          <label class="control-label">可选班级:<span class="tips" ng-hide="tipHide">请选择院系专业年级</span></label>
+          <label class="btn btn-default" ng-repeat="class in classes" ng-model="class.isSelected" btn-checkbox>{{ class.name }}</label>
+        </div>
+      </div>
+      <div class="row form-group">
+        <div class="col-sm-3">
+          <label class="control-label">教师代号:</label>
+          <input type="text" class="form-control" ng-model="teacherId"></input>
+        </div>
+        <div class="col-sm-3">
+          <label class="control-label">教师姓名:</label>
+          <input type="text" ng-readonly="isReadonly" class="form-control" ng-model="teacherName"></input>
+        </div>
+      </div>
+      <div class="form-group">
+      </div>
+      <div class="form-group">
+        <label class="control-label">周数:</label>
+        <p ng-repeat="weekSec in weeksSecs"> {{ weekSec.describe }} </p>
+      </div>
+      <div class="row form-group">
+        <form>
+          <div class="col-sm-3">
+            <label class="control-label">开始周数:</label>
+            <input type="text" class="form-control" ng-model="startweek"></input>
+          </div>
+          <div class="col-sm-3">
+            <label class="control-label">结束周数:</label>
+            <input type="text" class="form-control" ng-model="endweek"></input>
+          </div>
+          <div class="col-sm-3">
+            <label class="control-label">确定添加: </label>
+            <button type="text" class="btn btn-default">添加</button>
+          </div>
+        </form>
+      </div>
+      <div class="form-group">
+        <label class="control-label">周数:</label>
+        <p ng-repeat="weekSec in weeksSecs"> {{ weekSec.describe }} </p>
+      </div>
+      <div class="row form-group">
+        <form>
+          <div class="col-sm-3">
+            <label class="control-label">星期:</label>
+            <select type="text" class="form-control" ng-model="startweek"></select>
+          </div>
+          <div class="col-sm-3">
+            <label class="control-label">节次:</label>
+            <select type="text" class="form-control" ng-model="endweek"></select>
+          </div>
+          <div class="col-sm-3">
+            <label class="control-label">确定添加: </label>
+            <button type="text" class="btn btn-default">添加</button>
+          </div>
+        </form>
+      </div>
+      <div class="form-group row">
+        <div class="col-sm-3">
+          <label class="control-label">课程性质:</label>
+          <select class="form-control"></select>
+        </div>
+        <div class="col-sm-3">
+          <label class="control-label">课程类别:</label>
+          <select class="form-control"></select>
+        </div>
+      </div>
+      <div class="form-group row">
+        <div class="col-sm-2">
+          <label class="control-label">课程总学时:</label>
+          <input class="form-control"></input>
+        </div>
+        <div class="col-sm-2">
+          <label class="control-label">讲课学时:</label>
+          <input class="form-control"></input>
+        </div>
+        <div class="col-sm-2">
+          <label class="control-label">上机学时:</label>
+          <input class="form-control"></input>
+        </div>
+        <div class="col-sm-2">
+          <label class="control-label">实验学时:</label>
+          <input class="form-control"></input>
+        </div>
+        <div class="col-sm-2">
+          <label class="control-label">课外学时:</label>
+          <input class="form-control"></input>
+        </div>
+        <div class="col-sm-2">
+          <label class="control-label">本学期总学时:</label>
+          <input class="form-control"></input>
+        </div>
+      </div>
+    </form>
+    <!-- alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.msg}}</alert -->
+  </div><!-- modal-body -->
+
+  <div class="modal-footer">
+    <button type="button" class="btn btn-default" ng-click="cancel()">取消</button>
+    <button type="button" class="btn btn-primary" ng-click="">注册</button>
+  </div><!-- modal-footer</script> <!-- add grade dialog --> <script type="text/ng-template" id="addGradeDialog.html"><div class="modal-header">
+    <button type="button" class="close" ng-click="cancel()" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    <h4 class="modal-title">添加年级</h4>
+  </div><!-- modal-header -->
+
+  <div class="modal-body">
+    <div>
+      <p>已有年级</p>
+      <p ng-repeat="grade in grades"><a class="grade">{{ grade._id}} - {{ grade.name }} 
+        <button type="button" class="close nav-close" ng-click="deleteGrade(grade._id)" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </a></p>
+    </div>
+    <form ng-submit="ok()">
+      <div class="form-group">
+        <label class="control-label">请输入名称:</label>
+        <input type="text" class="form-control" ng-model="gradeName"></input>
+      </di>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-default" ng-click="cancel()">取消</button>
+    <button class="btn btn-primary" ng-click="ok()">确定</button>
+  </div></script>
