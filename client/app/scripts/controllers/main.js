@@ -9,7 +9,7 @@
  */
 
 function MainCtrl($q, $resource, $scope, $location, 
-  $modal, Auth, Apartment, Major, Cls, Teacher){
+  $modal, Auth, Apartment, Major, Cls, Teacher, Course){
 
   $scope.user = new Auth();  
   $scope.user.$check();
@@ -45,109 +45,22 @@ function MainCtrl($q, $resource, $scope, $location,
     return deferred.promise;
   };
 
+  // apply for courses' data
+  $scope.getCourses = function() {
+    var deferred = $q.defer();
+    Course.get(function(data) {
+      $scope.courses = data.courses;
+      //console.dir(data.courses);
+      deferred.resolve();
+    });
+    return deferred.promise;
+  };
+
   $scope
     .getApartments()
     .then($scope.getTeachers)
-    .then($scope.getGrades);
-
-  $scope.courses = [
-    {
-      id: 1,
-      name: '信息论基础',
-      teacher: '张三',
-      apartment: '电信学院',
-      major: '电子信息工程',
-      time: '周三78节 周五12节'
-    },
-    {
-      id: 2,
-      name: '信息论基础',
-      teacher: '张三',
-      apartment: '电信学院',
-      major: '电子信息工程',
-      time: '周三78节 周五12节'
-    },
-    {
-      id: 3,
-      name: '信息论基础',
-      teacher: '张三',
-      apartment: '电信学院',
-      major: '电子信息工程',
-      time: '周三78节 周五12节'
-    },
-    {
-      id: 1,
-      name: '信息论基础',
-      teacher: '张三',
-      apartment: '电信学院',
-      major: '电子信息工程',
-      time: '周三78节 周五12节'
-    },
-    {
-      id: 1,
-      name: '信息论基础',
-      teacher: '张三',
-      apartment: '电信学院',
-      major: '电子信息工程',
-      time: '周三78节 周五12节'
-    },
-    {
-      id: 1,
-      name: '信息论基础',
-      teacher: '张三',
-      apartment: '电信学院',
-      major: '电子信息工程',
-      time: '周三78节 周五12节'
-    },
-    {
-      id: 1,
-      name: '信息论基础',
-      teacher: '张三',
-      apartment: '电信学院',
-      major: '电子信息工程',
-      time: '周三78节 周五12节'
-    },
-    {
-      id: 1,
-      name: '信息论基础',
-      teacher: '张三',
-      apartment: '电信学院',
-      major: '电子信息工程',
-      time: '周三78节 周五12节'
-    },
-    {
-      id: 1,
-      name: '信息论基础',
-      teacher: '张三',
-      apartment: '电信学院',
-      major: '电子信息工程',
-      time: '周三78节 周五12节'
-    },
-    {
-      id: 1,
-      name: '信息论基础',
-      teacher: '张三',
-      apartment: '电信学院',
-      major: '电子信息工程',
-      time: '周三78节 周五12节'
-    },
-    {
-      id: 1,
-      name: '信息论基础',
-      teacher: '张三',
-      apartment: '电信学院',
-      major: '电子信息工程',
-      time: '周三78节 周五12节'
-    },
-    {
-      id: 1,
-      name: '信息论基础',
-      teacher: '张三',
-      apartment: '电信学院',
-      major: '电子信息工程',
-      time: '周三78节 周五12节'
-    }
-  ];
+    .then($scope.getGrades)
+    .then($scope.getCourses);
 
   // delete apartment 
   $scope.deleteApartment = function(aptid) {
@@ -310,7 +223,7 @@ function MainCtrl($q, $resource, $scope, $location,
 
   // add course dialog
   $scope.addCourseDialog = function() {
-    $modal.open({
+    var modalInstance = $modal.open({
       templateUrl: 'addCourseDialog.html',
       controller: 'AddCourseDialogCtrl',
       resolve: { 
@@ -319,6 +232,9 @@ function MainCtrl($q, $resource, $scope, $location,
         grades: $scope.getGradesValue
       },
       size: 'lg'
+    });
+    modalInstance.result.then(function() {
+      $scope.getCourses();
     });
   };
   // excel upload dialog called every upload clicked
@@ -360,7 +276,7 @@ function MainCtrl($q, $resource, $scope, $location,
   };
 }
 MainCtrl.$inject = ['$q', '$resource', '$scope', '$location', '$modal',
-  'Auth', 'Apartment', 'Major', 'Cls', 'Teacher'];
+  'Auth', 'Apartment', 'Major', 'Cls', 'Teacher', 'Course'];
 
 // EditCoureseDialogCtrl
 function EditCourseDialogCtrl($scope, $modalInstance) {
@@ -468,6 +384,7 @@ function AddCourseDialogCtrl($scope, $modalInstance, Apartment,
     { _id: 5, name: '第11,12节'}
   ];
   $scope.times = [];
+  $scope.timeNPlaceName = '';
   $scope.weekday = {};
   $scope.position = {};
   $scope.addTime = function() {
@@ -480,6 +397,7 @@ function AddCourseDialogCtrl($scope, $modalInstance, Apartment,
       position: $scope.position,
       name: name
     });
+    $scope.timeNPlaceName += name + ' ';
   };
 
   // 8th section 
@@ -556,8 +474,13 @@ function AddCourseDialogCtrl($scope, $modalInstance, Apartment,
       if(cls.isSelected === undefined) { return false; }
       return cls.isSelected;
     };
+    course.classesName = '';
     if($scope.classes !== undefined) {
       course.classes = $scope.classes.filter(filt);
+      var nameClasses = function(cls) {
+        course.classesName += cls.name + ' ';
+      };
+      course.classes.forEach(nameClasses);
     }
     course.teacher = {};
     course.teacher._id = $scope.teacherId;
@@ -565,12 +488,14 @@ function AddCourseDialogCtrl($scope, $modalInstance, Apartment,
     course.arrange = {};
     course.arrange.weeks = [];
     course.arrange.timeNPlace = [];
+    course.arrange.timeNPlaceName = $scope.timeNPlaceName;
 
     // push week number into course.arrange.weeks 
     // according to the weekSecs
     $scope.weekSecs.forEach(function(weekSec) {
       var start = parseInt(weekSec.startweek);
       var end = parseInt(weekSec.endweek);
+      course.arrange.weeksName = '第' + start + '至' + end + '周';
       for(var i=start; i<=end; i++) {
         course.arrange.weeks.push(i);
       }
@@ -579,10 +504,15 @@ function AddCourseDialogCtrl($scope, $modalInstance, Apartment,
     $scope.times.forEach(function(time) {
       course.arrange.timeNPlace.push(time);
     });
-    course.isCompulsory = $scope.isCompulsory;
+    course.type = {};
+    course.type.isCompulsory = $scope.isCompulsory;
+    if($scope.isCompulsory === true ) { course.type.name = '必修'; }
+    else { course.type.name = '选修'; }
     course.category = $scope.selectedCategory;
-    course.$save();
-    $modalInstance.close();
+    course.$save(function() {
+      $modalInstance.close();
+    });
+    console.dir(course);
   };
   $scope.cancel = function() {
     $modalInstance.dismiss('cancel');

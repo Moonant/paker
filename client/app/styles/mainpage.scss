@@ -57,15 +57,15 @@ body {
   padding-left: 20px;
 }
 
-.nav-sidebar > li > ul > li > a {
+.nav-sidebar > div > li > ul > li > a {
 	padding-left: 40px;
 }
 
-.nav-sidebar > li > ul > li > ul > li > a {
+.nav-sidebar > div > li > ul > div > li > ul > li > a {
 	padding-left: 60px;
 }
 
-.nav-sidebar > li > ul > li > ul > li > ul > li > a {
+.nav-sidebar > div > li > ul > div > li > ul > div > li > ul > li > a {
 	padding-left: 80px;
 }
 
@@ -189,3 +189,4 @@ button.course-delete {
 .form-inline {
   display: inline-block;
 }
+

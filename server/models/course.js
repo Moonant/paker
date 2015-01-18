@@ -15,23 +15,24 @@ var courseSchema = new Schema({
     name: { type: String}
   },
   apartment: {
-    _id: { type: Number },
+    _id: { type: Number, unique: false },
     name: { type: String}
   },
   major: {
-    _id: { type: Number },
+    _id: { type: Number, unique: false },
     name: { type: String }
   },
   grade: {
-    _id: { type: Number },
+    _id: { type: Number, unique: false },
     name: { type: String }
   },
   classes: [ 
     { 
-      _id: { type: Number },
+      _id: { type: Number, unique: false },
       name: { tyep: String }
     }
   ],
+  classesName: { type: String }, // needed to show the classes
   onlineHours: { type: Number },
   lectureHours: { type: Number },
   onlineHours: { type: Number },
@@ -39,26 +40,30 @@ var courseSchema = new Schema({
   labHours: { type: Number },
   extracurricular: { type: Number },
   totalHours: { type: Number },
-  isCompulsory: { type: Boolean },
+  type: {
+    isCompulsory: { type: Boolean },
+    name: { type:String }
+  },
   category: {
-    _id: { type: Number },
+    _id: { type: Number, unique: false },
     name: { type: String }
   },
   arrange: {
     weeks: [Number],
     timeNPlace: [{
       weekday: { 
-        _id: { type: Number },
+        _id: { type: Number, unique: false },
         name: { type: String }
       },
       // means the class' position in on day
       position: { 
-        _id: { type: Number },
+        _id: { type: Number, unique: false },
         name: { type: String }
-      },//
-      classrome: { type: String }//
+      },
+      classrome: { type: String }
     }],
-    describe: { type: String }
+    timeNPlaceName: { type: String },
+    weeksName: { type: String }  // needed to show the weeks
   }
 });
 

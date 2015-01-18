@@ -6,7 +6,7 @@
 function Course($resource){
   var options = {
   };
-  return $resource('/course/:crsid',
+  return $resource('/courses/:crsid',
     { crsid: '' },
     options);
 }

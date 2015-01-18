@@ -13,24 +13,45 @@ var auth = function(req, res, next){
 };
 
 // add a course
-router.post('/course', auth, function(req, res) {
+router.post('/courses', auth, function(req, res) {
   // connnect to mongodb
   var connStr = 'mongodb://localhost:27017/packer';
   mongoose.connect(connStr, function(err) {
     if(err) console.log('post /course' + err);
   });
   var newCourse = new Course(req.body);
-  console.dir(newCourse);
-  if(newCourse.name === null) return;
-  if(newCourse.intermHours === null) return;
-  if(newCourse.isCompulsory === null) return;
-  if(newCourse.grade === {}) return;
-  if(newCourse.teacher === {}) return;
-  newCourse.save(function(err) {
-    if(err) console.log(err);
+  console.dir(req.body);
+  var invalid = newCourse.name === null;
+  invalid = invalid || newCourse.intermHours === null;
+  invalid = invalid || newCourse.isCompulsory === null;
+  invalid = invalid || newCourse.grade === {};
+  invalid = invalid || newCourse.teacher === {};
+  if(invalid) {
     res.end();
     mongoose.connection.close();
+    return;
+  }
+  newCourse.save(function(err) {
+    if(err) console.log(err);
+    mongoose.connection.close();
+    res.end();
   });
 });
+
+// get courses
+router.get('/courses', auth, function(req, res) {
+  var connStr = 'mongodb://localhost:27017/packer';
+  mongoose.connect(connStr, function(err) {
+    if(err) console.log('get courses' + err);
+  });
+  Course.find({}, function(err, courses) {
+    if(err) console.log('get courses' + err);
+    var s = {};
+    s.courses = courses;
+    mongoose.connection.close();
+    res.send(s);
+  });
+});
+
 
 module.exports = router;
