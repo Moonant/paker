@@ -1,7 +1,7 @@
 var express = require('express');
 var passport = require('../passport');
 var mongoose = require('mongoose');
-var User = require('../classes/user');
+var User = require('../models/user');
 var router = express.Router();
 
 // Define a middleware function to be used for every secured routes
@@ -12,8 +12,10 @@ var auth = function(req, res, next){
     next();
 };
 
+router.all('/', auth);
+
 // main page router
-router.get('/users', auth, function(req, res){
+router.get('/users', function(req, res){
   res.send([{name: "user1"}, {name: "user2"}]);
 });
 

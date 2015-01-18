@@ -1,7 +1,7 @@
 var express = require('express');
 var passport = require('../passport');
 var mongoose = require('mongoose');
-var Course = require('../classes/course');
+var Course = require('../models/course');
 var router = express.Router();
 
 // Define a middleware function to be used for every secured routes
@@ -13,27 +13,45 @@ var auth = function(req, res, next){
 };
 
 // add a course
-router.put('/course', auth, function(req, res) {
-  // get sent data 
-  var course = req
-
-  var newCourse = new Course(user);
+router.post('/courses', auth, function(req, res) {
   // connnect to mongodb
   var connStr = 'mongodb://localhost:27017/packer';
   mongoose.connect(connStr, function(err) {
-    if(err) throw err;
+    if(err) console.log('post /course' + err);
   });
-  newCourse.save(function(err) {
-    if(err) {
-      res.send({
-        message: 'something wrong'
-      });
-    }
-    else {
-      res.send(newCourse);
-    }
+  var newCourse = new Course(req.body);
+  console.dir(req.body);
+  var invalid = newCourse.name === null;
+  invalid = invalid || newCourse.intermHours === null;
+  invalid = invalid || newCourse.isCompulsory === null;
+  invalid = invalid || newCourse.grade === {};
+  invalid = invalid || newCourse.teacher === {};
+  if(invalid) {
+    res.end();
     mongoose.connection.close();
+    return;
+  }
+  newCourse.save(function(err) {
+    if(err) console.log(err);
+    mongoose.connection.close();
+    res.end();
   });
 });
+
+// get courses
+router.get('/courses', auth, function(req, res) {
+  var connStr = 'mongodb://localhost:27017/packer';
+  mongoose.connect(connStr, function(err) {
+    if(err) console.log('get courses' + err);
+  });
+  Course.find({}, function(err, courses) {
+    if(err) console.log('get courses' + err);
+    var s = {};
+    s.courses = courses;
+    mongoose.connection.close();
+    res.send(s);
+  });
+});
+
 
 module.exports = router;
