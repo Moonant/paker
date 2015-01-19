@@ -32,7 +32,7 @@ var courseSchema = new Schema({
       name: { tyep: String }
     }
   ],
-  classesName: { type: String }, // needed to show the classes
+  classesName: { type: String }, // needed to show the classes// 
   onlineHours: { type: Number },
   lectureHours: { type: Number },
   onlineHours: { type: Number },
@@ -49,7 +49,11 @@ var courseSchema = new Schema({
     name: { type: String }
   },
   arrange: {
-    weeks: [Number],
+    weekSecs: [{
+      endweek: { type: Number},
+      startweek: { type: Number},
+      name: { type: String }
+    }],
     timeNPlace: [{
       weekday: { 
         _id: { type: Number, unique: false },
@@ -63,7 +67,7 @@ var courseSchema = new Schema({
       classrome: { type: String }
     }],
     timeNPlaceName: { type: String },
-    weeksName: { type: String }  // needed to show the weeks
+    weeksName: { type: String }  // needed to show the weeks// 
   }
 });
 

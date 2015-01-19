@@ -53,5 +53,18 @@ router.get('/courses', auth, function(req, res) {
   });
 });
 
+// delete a apartment
+router.delete('/courses/:crsid', auth, function(req, res) {
+  var crsid = req.params.crsid;
+  var connStr = 'mongodb://localhost:27017/packer';
+  mongoose.connect(connStr, function(err) {
+    if(err) console.log('delete course' + err);
+  });
+  Course.remove({ _id: crsid }, function(err) {
+    if(err) console.log('delete course' + err);
+    res.end();
+    mongoose.connection.close();
+  });
+});
 
 module.exports = router;

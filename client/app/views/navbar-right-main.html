@@ -59,45 +59,57 @@
     <form ng-submit="addCourse()">
       <!-- 1st section -->
       <div class="row form-group"><!-- courseName, selectedApartment, selectedMajor, selectedGrade; apartments and grades is needed -->
-        <div class="col-sm-3">
+        <div class="col-sm-2">
           <label class="control-label">课程名称:</label>
-          <input type="text" class="form-control" ng-required ng-model="courseName"></input>
+          <input type="text" class="form-control" ng-required ng-model="course.name"></input>
         </div>
-        <div class="col-sm-3">
+        <div class="col-sm-2">
           <label class="control-label">院系:</label>
-          <select ng-options="apartment as apartment.name for apartment in apartments" class="form-control" ng-model="selectedApartment"></select>
+          <select ng-options="apartment as apartment.name for apartment in apartments" class="form-control" ng-model="course.apartment"></select>
         </div>
-        <div class="col-sm-3">
+        <div class="col-sm-2">
           <label class="control-label">专业:</label>
-          <select class="form-control" ng-options="major as major.name for major in selectedApartment.majors" ng-model="selectedMajor"></select>
+          <select class="form-control" ng-options="major as major.name for major in course.apartment.majors" ng-model="course.major"></select>
         </div>
         <div class="col-sm-2">
           <label class="control-label">年级:</label>
-          <select ng-options="grade as grade.name for grade in grades" ng-change="selectClasses()" class="form-control" ng-model="selectedGrade"></select>
+          <select ng-options="grade as grade.name for grade in grades" class="form-control" ng-model="course.grade"></select>
         </div>
-      </div><hr/>
+        <div class="col-sm-2">
+          <label class="control-label">课程性质:</label>
+          <select class="form-control" ng-options="com as com.name for com in comOpts" ng-model="course.type"></select>
+        </div>
+        <div class="col-sm-2">
+          <label class="control-label">课程类别:</label>
+          <select class="form-control" ng-options="category as category.name for category in categories" ng-model="course.category"></select>
+        </div>
+      </div>
 
       <!-- 2nd section -->
-      <div class="form-inline"><!-- lectureHours, onlineHours, intermHours -->
-        <div class="form-group">
-          <label class="form-inline control-label">讲课学时:</label>
-          <input class="form-inline form-control" ng-model="lectureHours"></input>
-          <label class="control-label">上机学时:</label>
-          <input class="form-control" ng-model="onlineHours"></input>
-          <label class="control-label">本学期总学时:</label>
-          <input class="form-control" ng-required ng-model="intermHours"></input>
+      <div class="row form-group"><!-- lectureHours, onlineHours, intermHours -->
+        <div class="col-sm-2">
+          <label class="control-label">讲课学时:</label>
+          <input class="form-control" ng-model="course.lectureHours"></input>
         </div>
-      </div><hr/>
-
-      <!-- 3rd section -->
-      <div class="form-inline"><!-- labHours, extracurricular, totalHours -->
-        <div class="form-group">
+        <div class="col-sm-2">
+          <label class="control-label">上机学时:</label>
+          <input class="form-control" ng-model="course.onlineHours"></input>
+        </div>
+        <div class="col-sm-2">
+          <label class="control-label">本学期总学时:</label>
+          <input class="form-control" ng-required ng-model="course.intermHours"></input>
+        </div>
+        <div class="col-sm-2">
           <label class="control-label">实验学时:</label>
-          <input class="form-control" ng-model="labHours"></input>
+          <input class="form-control" ng-model="course.labHours"></input>
+        </div>
+        <div class="col-sm-2">
           <label class="control-label">课外学时:</label>
-          <input class="form-control" ng-model="extracurricular"></input>
-          <label class="form-inline control-label">本课程总学时:</label>
-          <input class="form-inline form-control" ng-model="totalHours"></input>
+          <input class="form-control" ng-model="course.extracurricular"></input>
+        </div>
+        <div class="col-sm-2">
+          <label class="control-label">本课程总学时:</label>
+          <input class="form-control" ng-model="course.totalHours"></input>
         </div>
       </div><hr/>
 
@@ -105,37 +117,38 @@
       <div class="row form-group"><!-- seg in classes; tipHide, classes are needed -->
         <div class="col-sm-9">
           <label class="control-label">可选班级:<span class="warm" ng-hide="tipHide">请选择院系专业年级</span></label>
-          <label class="btn btn-default" ng-repeat="class in classes" ng-model="class.isSelected" btn-checkbox>{{ class.name }}</label>
+          <label class="btn btn-default" ng-repeat="class in course.classes" ng-model="class.isSelected" btn-checkbox>{{ class.name }}</label>
         </div>
       </div><hr/>
 
       <!-- 5th section -->
-      <div class="form-inline"><!-- teacherId, teacherName -->
-        <div class="form-group">
-          <label class="form-inline control-label">教师代号:</label>
-          <input ng-required type="text" class="form-inline form-control" ng-model="teacherId"></input>
-          <label class="form-inline control-label">教师姓名:</label>
-          <input ng-required type="text" ng-readonly="isReadonly" class="form-inline form-control" ng-model="teacherName"></input>
+      <div class="row form-group"><!-- teacherId, teacherName -->
+        <div class="col-sm-2">
+          <label class="control-label">教师代号:</label>
+          <input ng-required type="text" class="form-control" ng-model="course.teacher._id"></input>
         </div>
-      </div><hr />
-
-      <!-- 6th section -->
-      <div class="form-group"><!-- weekSecs is needed to save -->
-        <label class="control-label">周数: <span ng-repeat="weekSec in weekSecs" class="tip">{{ weekSec.name }}; </span></label>
-      </div>
-      <div class="form-inline"><!-- startweek, endweek -->
-        <div class="form-group">
+        <div class="col-sm-2">
+          <label class="control-label">教师姓名:</label>
+          <input ng-required type="text" ng-readonly="isReadonly" class="form-control" ng-model="course.teacher.name"></input>
+        </div>
+        <div class="col-sm-2">
           <label class="form-inline control-label">开始周数:</label>
           <input type="text" class="form-inline form-control" ng-model="startweek"></input>
+        </div>
+        <div class="col-sm-2">
           <label class="form-inline control-label">结束周数:</label>
           <input type="text" class="form-inline form-control" ng-model="endweek"></input>
-          <button type="button" ng-click="addWeekSec()" class="btn btn-default">添加</button>
+        </div>
+        <div class="col-sm-2">
+          <label class="control-label">添加:</label>
+          <button type="button" ng-click="addWeekSec()" class="form-control btn btn-primary">添加</button>
         </div>
       </div><hr/>
 
       <!-- 7th section -->
-      <div class="form-group"><!-- arranges is needed to save -->
-        <label class="control-label">上课时间: <span ng-repeat="time in times" class="tip">{{ time.name }}; </span></label>
+      <div class="form-group row"><!-- arranges is needed to save -->
+        <label class="control-label col-sm-12">周数: <span ng-repeat="weekSec in course.arrange.weekSecs" class="tip">{{ weekSec.name }}; </span></label>
+        <label class="control-label col-sm-12">上课时间: <span ng-repeat="time in course.arrange.timeNPlace" class="tip">{{ time.name }}; </span></label>
       </div>
       <div class="form-inline"><!-- weekday, positon -->
         <div class="form-group">
@@ -144,16 +157,6 @@
           <label class="form-inline control-label">节次:</label>
           <select ng-options="pos as pos.name for pos in positions" class="form-inline form-control" ng-model="position"></select>
           <button type="button" ng-click="addTime()" class="btn btn-default">添加</button>
-        </div>
-      </div><hr/>
-
-      <!-- 8th section -->
-      <div class="form-inline"><!-- isCompulsory, selectedCategory; comOpts and categories are needed -->
-        <div class="form-group">
-          <label class="form-inline control-label">课程性质:</label>
-          <select class="form-inline form-control" ng-options="com as com.name for com in comOpts" ng-model="selectedCom" ng-change="changeIsCompulsory()"></select>
-          <label class="form-inline control-label">课程类别:</label>
-          <select class="form-inline form-control" ng-options="category as category.name for category in categories" ng-model="selectedCategory"></select>
         </div>
       </div>
     </form>
