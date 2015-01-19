@@ -72,6 +72,16 @@ function MainCtrl($q, $resource, $scope, $location,
       });
   };
 
+  // delete a course
+  $scope.deleteCourse = function(crsid) {
+    var deletedCourse = new Course();
+    deletedCourse.$delete(
+      { crsid: crsid },
+      function() {
+        $scope.getCourses();
+      });
+  };
+
   // delete major
   $scope.deleteMajor = function(aptid, mjid) {
     var deletedMajor = new Major();
@@ -117,6 +127,11 @@ function MainCtrl($q, $resource, $scope, $location,
   // for inside controller to call
   $scope.getGradesValue = function() {
     return $scope.grades;
+  };
+
+  // for inside controller to call
+  $scope.getCoursesValue = function() {
+    return $scope.courses;
   };
 
   // add grade dialog
@@ -264,27 +279,166 @@ function MainCtrl($q, $resource, $scope, $location,
     Auth.logout();
     $location.url('/login');
   };
-  // When the title of a course if clicked
-  // Edit course
-  $scope.editCourse = function(id) {
+
+  // edit course
+  $scope.editCourse = function(crsid) {
     $modal.open({
-      templateUrl: 'editDialog.html',
+      templateUrl: 'editCourseDialog.html',
       controller: 'EditCourseDialogCtrl',
+      resolve: {
+        course: function() {
+          var courses = $scope.getCoursesValue();
+          var filt = function(course) {
+            return course._id === crsid;
+          };
+          return courses.filter(filt)[0];
+        },
+        grades: $scope.getGradesValue,
+        apartments: $scope.getApartmentsValue,
+        teachers: $scope.getTeachersValue
+      },
       size: 'lg'
     });
-    console.log(id);
   };
 }
 MainCtrl.$inject = ['$q', '$resource', '$scope', '$location', '$modal',
   'Auth', 'Apartment', 'Major', 'Cls', 'Teacher', 'Course'];
 
 // EditCoureseDialogCtrl
-function EditCourseDialogCtrl($scope, $modalInstance) {
+function EditCourseDialogCtrl($scope, $modalInstance, course, grades, apartments, teachers) {
+  //console.dir(course);
+  $scope.grades = grades;
+  $scope.apartments = apartments;
+  $scope.teachers = teachers;
+  $scope.course = course;
+  console.dir($scope.course);
+
+  // 4th section 
+  $scope.tipHide = false;
+  // select the grade specified classes 
+  $scope.$watch('course.grade', function() {
+    var filt = function(cls) {
+      if(cls.grade === undefined) { return false; }
+      return cls.grade._id === $scope.course.grade._id;
+    };
+    if($scope.course.major.classes) {
+      $scope.course.classes = $scope.course.major.classes.filter(filt);
+      $scope.tipHide = true;
+    }
+  });
+
+  // 5th section 
+  $scope.isReadonly = false;
+
+  // 6th section
+  $scope.startweek = '';
+  $scope.endweek = '';
+  $scope.addWeekSec = function() {
+    // start week and end week not blank
+    if($scope.startweek === '' || $scope.endweek === '') { return; }
+    var name = $scope.startweek + '周至' + $scope.endweek + '周';
+    $scope.course.arrange.weekSecs.push({
+      startweek: $scope.startweek,
+      endweek: $scope.endweek,
+      name: name 
+    });
+  };
+
+  // 7th seciton
+  $scope.weekdays = [
+    { _id: 0, name: '星期天'},
+    { _id: 1, name: '星期一'},
+    { _id: 2, name: '星期二'},
+    { _id: 3, name: '星期三'},
+    { _id: 4, name: '星期四'},
+    { _id: 5, name: '星期五'},
+    { _id: 6, name: '星期六'}
+  ];
+  $scope.positions = [
+    { _id: 0, name: '第1,2节'},
+    { _id: 1, name: '第3,4节'},
+    { _id: 2, name: '第5,6节'},
+    { _id: 3, name: '第7,8节'},
+    { _id: 4, name: '第9,10节'},
+    { _id: 5, name: '第11,12节'}
+  ];
+  $scope.addTime = function() {
+    if($scope.weekday.name === undefined || $scope.position.name === {}) {
+      return; 
+    }
+    var name = $scope.weekday.name + $scope.position.name;
+    $scope.course.arrange.timeNPlace.push({
+      weekday: $scope.weekday,
+      position: $scope.position,
+      name: name
+    });
+    $scope.course.arrange.timeNPlaceName += name + ' ';
+  };
+
+  // 8th section 
+  $scope.comOpts = [
+    { isCompulsory: false, name: '选修' },
+    { isCompulsory: true, name: '必修' }
+  ];
+  $scope.categories = [
+    { _id: 0, name: '通识教育课程' },
+    { _id: 1, name: '学科基础教程' }
+  ];
+  $scope.$watch('course.teacher._id', function() {
+    var filt = function(item) {
+      return item._id === parseInt($scope.course.teacher._id);
+    };
+    var teacher = $scope.teachers.filter(filt);
+    if(teacher[0]) {
+      $scope.course.teacher = teacher[0];
+      $scope.isReadonly = true;
+    }
+    else {
+      $scope.course.teacher.name = '';
+      $scope.isReadonly = false;
+    }
+  });
+  $scope.cancel = function() {
+    $modalInstance.dismiss('cancel');
+    //console.dir($scope.selectedApartment);
+  };
+
+  $scope.addCourse = function() {
+    $scope.course.arrange.weekSecs.forEach(function(weekSec) {
+      $scope.course.arrange.weeksName += weekSec.name + ' ';
+    });
+    var classes = [];
+    $scope.course.classes.forEach(function(cls) {
+      if(cls.isSelected) {
+        classes.push(cls);
+      }
+    });
+    $scope.course.classes = classes;
+    $scope.course.classesName = '';
+    $scope.course.classes.forEach(function(cls) {
+      $scope.course.classesName += cls.name + ' ';
+    });
+    $scope.course.$save(function() {
+      $modalInstance.close();
+    });
+  };
   $scope.cancel = function() {
     $modalInstance.dismiss('cancel');
   };
 }
-EditCourseDialogCtrl.$inject = ['$scope', '$modalInstance'];
+EditCourseDialogCtrl.$inject = ['$scope', '$modalInstance', 'course', 'grades', 'apartments', 'teachers'];
+
+// Controller for add apartment dialog
+function AddApartmentDialogCtrl($scope, $modalInstance) {
+  $scope.apartmentName = '';
+  $scope.ok = function() {
+    $modalInstance.close($scope.apartmentName);
+  };
+  $scope.cancel = function() {
+    $modalInstance.dismiss('cancel');
+  };
+}
+AddApartmentDialogCtrl.$inject = ['$scope', '$modalInstance', 'course'];
 
 // Controller for ConfirmDialog
 function ConfirmDialogCtrl($scope, $modalInstance, msg) {
@@ -310,55 +464,58 @@ UploadDialogCtrl.$inject = ['$scope', '$modalInstance'];
 function AddCourseDialogCtrl($scope, $modalInstance, Apartment, 
   apartments, teachers, grades, Course) {
 
+  $scope.course = new Course();
   // data required, should resolve in enclosing scope
   $scope.grades = grades;
   $scope.apartments = apartments;
   $scope.teachers = teachers;
 
   // 1st section
-  $scope.courseName = '';
-  $scope.selectedApartment = {};
-  $scope.selectedMajor = {};
-  $scope.selectedGrade = {};
+  $scope.course.name = '';
+  $scope.course.apartment = {};
+  $scope.course.major = {};
+  $scope.course.grade = {};
 
   // 2nd section 
-  $scope.lectureHours = '';
-  $scope.onlineHours = '';
-  $scope.intermHours = '';
+  $scope.course.lectureHours = '';
+  $scope.course.onlineHours = '';
+  $scope.course.intermHours = '';
 
   // 3rd  section
-  $scope.labHours = '';
-  $scope.extracurricular = '';
-  $scope.totalHours = '';
+  $scope.course.labHours = '';
+  $scope.course.extracurricular = '';
+  $scope.course.totalHours = '';
 
   // 4th section 
   $scope.tipHide = false;
   // select the grade specified classes 
-  $scope.$watch('selectedGrade', function() {
+  $scope.$watch('course.grade', function() {
     var filt = function(cls) {
       if(cls.grade === undefined) { return false; }
-      return cls.grade._id === $scope.selectedGrade._id;
+      return cls.grade._id === $scope.course.grade._id;
     };
-    if($scope.selectedMajor.classes) {
-      $scope.classes = $scope.selectedMajor.classes.filter(filt);
+    if($scope.course.major.classes) {
+      $scope.course.classes = $scope.course.major.classes.filter(filt);
       $scope.tipHide = true;
     }
   });
 
   // 5th section 
-  $scope.teacherId = null;
-  $scope.teacherName = '';
+  $scope.course.teacher = {};
+  $scope.course.teacher._id = null;
+  $scope.course.teacher = '';
   $scope.isReadonly = false;
 
   // 6th section
   $scope.startweek = '';
   $scope.endweek = '';
-  $scope.weekSecs = [];
+  $scope.course.arrange ={};
+  $scope.course.arrange.weekSecs = [];
   $scope.addWeekSec = function() {
     // start week and end week not blank
     if($scope.startweek === '' || $scope.endweek === '') { return; }
     var name = $scope.startweek + '周至' + $scope.endweek + '周';
-    $scope.weekSecs.push({
+    $scope.course.arrange.weekSecs.push({
       startweek: $scope.startweek,
       endweek: $scope.endweek,
       name: name 
@@ -383,51 +540,45 @@ function AddCourseDialogCtrl($scope, $modalInstance, Apartment,
     { _id: 4, name: '第9,10节'},
     { _id: 5, name: '第11,12节'}
   ];
-  $scope.times = [];
-  $scope.timeNPlaceName = '';
   $scope.weekday = {};
   $scope.position = {};
+  $scope.course.arrange.timeNPlace = [];
+  $scope.course.arrange.timeNPlaceName = '';
   $scope.addTime = function() {
     if($scope.weekday.name === undefined || $scope.position.name === {}) {
       return; 
     }
     var name = $scope.weekday.name + $scope.position.name;
-    $scope.times.push({
+    $scope.course.arrange.timeNPlace.push({
       weekday: $scope.weekday,
       position: $scope.position,
       name: name
     });
-    $scope.timeNPlaceName += name + ' ';
+    $scope.course.arrange.timeNPlaceName += name + ' ';
   };
 
   // 8th section 
-  $scope.isCompulsory = false;
-  $scope.selectedCategory = {};
-  $scope.selectedCom = {};
   $scope.comOpts = [
-    { _id: '0', name: '选修' },
-    { _id: '1', name: '必修' }
+    { isCompulsory: false, name: '选修' },
+    { isCompulsory: true, name: '必修' }
   ];
+  $scope.course.type = {};
   $scope.categories = [
     { _id: 0, name: '通识教育课程' },
     { _id: 1, name: '学科基础教程' }
   ];
-  $scope.changeIsCompulsory = function() {
-    if($scope.selectedCom._id+'' === '0') { $scope.isCompulsory = false; }
-    else { $scope.isCompulsory = true; }
-  };
-
-  $scope.$watch('teacherId', function() {
+  $scope.course.category = {};
+  $scope.$watch('course.teacher._id', function() {
     var filt = function(item) {
-      return item._id === parseInt($scope.teacherId);
+      return item._id === parseInt($scope.course.teacher._id);
     };
     var teacher = $scope.teachers.filter(filt);
     if(teacher[0]) {
-      $scope.teacherName = teacher[0].name;
+      $scope.course.teacher = teacher[0];
       $scope.isReadonly = true;
     }
     else {
-      $scope.teacherName = '';
+      $scope.course.teacher.name = '';
       $scope.isReadonly = false;
     }
   });
@@ -437,82 +588,24 @@ function AddCourseDialogCtrl($scope, $modalInstance, Apartment,
   };
 
   $scope.addCourse = function() {
-    //console.log($scope.courseName);//
-    //console.dir($scope.selectedApartment);//
-    //console.dir($scope.selectedMajor);//
-    //console.dir($scope.selectedGrade);//
-    //console.log($scope.lectureHours);//
-    //console.log($scope.onlineHours);
-    //console.log($scope.intermHours + ';' + $scope.labHours + 
-    //  $scope.extracurricular + $scope.totalHours);
-    //console.dir($scope.classes);//
-    //console.log($scope.teacherName+$scope.teacherId);//
-    //console.dir($scope.weekSecs);//
-    //console.dir($scope.times);//
-    //console.log($scope.isCompulsory);//
-    //console.dir($scope.selectedCategory);
-    var course = new Course();
-    course.name = $scope.courseName;
-    course.apartment = {};
-    course.apartment._id = $scope.selectedApartment._id;
-    course.apartment.name = $scope.selectedApartment.name;
-    course.major = {};
-    course.major._id = $scope.selectedMajor._id;
-    course.major.name = $scope.selectedMajor.name;
-    course.grade = {};
-    course.grade._id = $scope.selectedGrade._id;
-    course.grade.name = $scope.selectedGrade.name;
-    course.lectureHours = $scope.lectureHours;
-    course.onlineHours = $scope.onlineHours;
-    course.intermHours = $scope.intermHours;
-    course.labHours = $scope.labHours;
-    course.extracurricular = $scope.extracurricular;
-    course.totalHours = $scope.totalHours;
-
-    // fiter to filt the selected classes
-    var filt = function(cls) {
-      if(cls.isSelected === undefined) { return false; }
-      return cls.isSelected;
-    };
-    course.classesName = '';
-    if($scope.classes !== undefined) {
-      course.classes = $scope.classes.filter(filt);
-      var nameClasses = function(cls) {
-        course.classesName += cls.name + ' ';
-      };
-      course.classes.forEach(nameClasses);
-    }
-    course.teacher = {};
-    course.teacher._id = $scope.teacherId;
-    course.teacher.name = $scope.teacherName;
-    course.arrange = {};
-    course.arrange.weeks = [];
-    course.arrange.timeNPlace = [];
-    course.arrange.timeNPlaceName = $scope.timeNPlaceName;
-
-    // push week number into course.arrange.weeks 
-    // according to the weekSecs
-    $scope.weekSecs.forEach(function(weekSec) {
-      var start = parseInt(weekSec.startweek);
-      var end = parseInt(weekSec.endweek);
-      course.arrange.weeksName = '第' + start + '至' + end + '周';
-      for(var i=start; i<=end; i++) {
-        course.arrange.weeks.push(i);
+    $scope.course.arrange.weeksName = '';
+    $scope.course.arrange.weekSecs.forEach(function(weekSec) {
+      $scope.course.arrange.weeksName += weekSec.name + ' ';
+    });
+    var classes = [];
+    $scope.course.classes.forEach(function(cls) {
+      if(cls.isSelected) {
+        classes.push(cls);
       }
     });
-    // push time into timeNPlace
-    $scope.times.forEach(function(time) {
-      course.arrange.timeNPlace.push(time);
+    $scope.course.classes = classes;
+    $scope.course.classesName = '';
+    $scope.course.classes.forEach(function(cls) {
+      $scope.course.classesName += cls.name + ' ';
     });
-    course.type = {};
-    course.type.isCompulsory = $scope.isCompulsory;
-    if($scope.isCompulsory === true ) { course.type.name = '必修'; }
-    else { course.type.name = '选修'; }
-    course.category = $scope.selectedCategory;
-    course.$save(function() {
+    $scope.course.$save(function() {
       $modalInstance.close();
     });
-    console.dir(course);
   };
   $scope.cancel = function() {
     $modalInstance.dismiss('cancel');
