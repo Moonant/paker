@@ -8,7 +8,7 @@ mongoose.connection.close();
 
 var gradeSchema = new Schema({
   _id: { type: Number },
-  name: { type: String },
+  name: { type: String }
 });
 
 gradeSchema.plugin(autoIncrement.plugin, { model: 'Grade', startAt: 0 });

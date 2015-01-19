@@ -1,2 +1,9 @@
 node_modules/
 *.swp
+.idea/
+/server/dist/
+/alg/
+bower_components/
+/client/.sass-cache/
+npm-debug.log
+

@@ -11,6 +11,8 @@ var course = require('./routes/course.js');
 var apartment = require('./routes/apartment.js');
 var teacher = require('./routes/teacher.js');
 var grade = require('./routes/grade.js');
+var alg = require('./alg/alg.js');
+var xlsx = require('./xlsx/xlsx.js');
 
 var app = express();
 
@@ -66,6 +68,8 @@ app.use(course);
 app.use(apartment);
 app.use(teacher);
 app.use(grade);
+app.use(alg);
+app.use(xlsx);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
