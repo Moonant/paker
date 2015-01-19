@@ -1,5 +1,5 @@
-var Set = require("./set.js");
-var Individule = require("./individule.js");
+var Set = require("./set");
+var Individule = require("./individule");
 /*
 var courses = [
     {id: 12, weekNum: 2, teacherId: 1, classesIds: [0, 1]}
@@ -37,10 +37,13 @@ var Population = function (courses, courseArranged) {
     this.pCoursesIds = [];
     this.pCoursesArranged = [];
 
+    this.courseRealIds = [];
+
     for (var i=0; i<courses.length; i++) {
         var c = courses[i];
         for (var j = 0; j < c.weekNum; j++) {
             this.pCoursesIds.push(i);
+            this.courseRealIds.push(c.id);
         }
 
         var tid = this.pTeacherIds.add(c.teacherId);
@@ -71,7 +74,7 @@ var Population = function (courses, courseArranged) {
     this.pConfig = {
         geneNum: this.pCoursesIds.length,
         genuLength: 5,
-        chromeLength:this.pCoursesIds.length*this.genuLength,
+        chromeLength:this.pCoursesIds.length*6,
         pweek: 21,
         pday: 5,
         ptime: 6,
@@ -102,8 +105,6 @@ Population.prototype.selectIndivi = function () {
     for (var i in this.individules) {
         var fitness = this.individules[i].calFitness();
 
-
-
         if (this.currentbestFitness < fitness) {
             this.currentbestFitness = fitness;
             this.currentIndividule = this.individules[i];
@@ -130,7 +131,6 @@ Population.prototype.selectIndivi = function () {
     }
     for (i = 0; i < this.pConfig.size; i++) {
         this.individules[i].chomesome = this.childPop[i].chomesome;
-
     }
 };
 
@@ -162,14 +162,13 @@ Population.prototype.exchange = function (x, y) {
 
 Population.prototype.cross = function (i) {
     var rnd = parseInt(this.pConfig.chromeLength * Math.random());
+    var c1 = this.individules[i].chomesome.slice(0, rnd);
+    var c2 = this.individules[i].chomesome.slice(rnd, this.pConfig.chromeLength);
+    var c3 = this.individules[i + 1].chomesome.slice(0, rnd);
+    var c4 = this.individules[i + 1].chomesome.slice(rnd, this.pConfig.chromeLength);
 
-    var c1 = this.individules[i].chomesome & ((1<<rnd)-1);
-    var c2 = this.individules[i+1].chomesome & ((1<<rnd)-1);
-
-    this.individules[i].chomesome = (this.individules[i].chomesome >> rnd << rnd)|c2;
-    this.individules[i + 1].chomesome = (this.individules[i+1].chomesome >> rnd << rnd)|c1;
-
-
+    this.individules[i].chomesome = c1 + c4;
+    this.individules[i + 1].chomesome = c3 + c2;
 };
 
 Population.prototype.mutate = function () {

@@ -1,6 +1,6 @@
 var Individule = function (pConfig, pCourses, pCoursesIds, pCoursesArranged, pTeacherIds, pClassesIds) {
 
-    this.chomesome = 0;
+    this.chomesome = "";
     this.fitness = 0;
 
     this.pConfig = pConfig;
@@ -18,7 +18,6 @@ var Individule = function (pConfig, pCourses, pCoursesIds, pCoursesArranged, pTe
 
     this.conflicts;
 
-
     this.initTables();
 };
 
@@ -34,30 +33,28 @@ Individule.prototype.setRandomChomesome = function () {
 };
 
 Individule.prototype.enCode = function () {
-    this.chomesome = 1;
+    this.chomesome = "";
     for (var i in this.timeTable) {
         var c = this.timeTable[i].dayId * this.pConfig.ptime + this.timeTable[i].timeId;
-        this.chomesome = (this.chomesome << this.pConfig.genuLength) | c;
-        console.log(this.chomesome.toString(2));
+        this.chomesome += this.padStr(c.toString(2), this.pConfig.genuLength);
     }
 };
 
 Individule.prototype.deCode = function () {
     this.timeTable = [];
-    var chome = this.chomesome;
-    for (var i = this.pConfig.geneNum - 1; i >= 0; i--) {
+    for (var i = 0; i < this.pConfig.geneNum; i++) {
         var item = {};
-        var c = chome & ((1 << this.pConfig.genuLength) - 1);
-        chome >>= this.pConfig.genuLength;
+        var gene = this.chomesome.substr(i * this.pConfig.genuLength, this.pConfig.genuLength);
+        var c = parseInt(gene, 2);
 
         if (c >= this.pConfig.pday * this.pConfig.ptime) {
             this.mutateSingleBit(i * this.pConfig.genuLength);
-            c &= ((1 << (this.pConfig.genuLength-1)) - 1);
+            c = parseInt(gene.substr(1, this.pConfig.genuLength-1), 2);
         }
 
         item.dayId = parseInt(c / this.pConfig.ptime);
         item.timeId = parseInt(c % this.pConfig.ptime);
-        this.timeTable[i] = item;
+        this.timeTable.push(item);
     }
 };
 
@@ -131,8 +128,12 @@ Individule.prototype.isConflict = function (obj, x, y, z, courseId) {
 };
 
 Individule.prototype.mutateSingleBit = function (i) {
-    var n = this.pConfig.chromeLength - i;
-    this.chomesome ^= (1 << (n - 1));
+    var c = this.chomesome.charAt(i);
+    if (c == '1') {
+        this.chomesome = this.chomesome.substring(0, i) + '0' + this.chomesome.substring(i + 1, this.pConfig.chromeLength);
+    } else {
+        this.chomesome = this.chomesome.substring(0, i) + '1' + this.chomesome.substring(i + 1, this.pConfig.chromeLength);
+    }
 };
 
 Individule.prototype.pad = function (num, n) {
@@ -161,9 +162,6 @@ Individule.prototype.calFitness = function () {
     this.deCode();
     this.clearTables();
 
-    //console.log(this.chomesome);
-    //console.log(this.chomesome.toString(2).slice(0,50));
-
     var tea = 0, clas = 0, clasDay = 0, night = 0;
 
     for (var i = 0; i < this.pConfig.geneNum; i++) {
@@ -173,7 +171,7 @@ Individule.prototype.calFitness = function () {
         var dayId = this.timeTable[i].dayId;
         var timeId = this.timeTable[i].timeId;
 
-        if (timeId > 3) {
+        if(timeId>3){
             night++;
         }
 
@@ -211,9 +209,9 @@ Individule.prototype.calFitness = function () {
         }
     }
 
-    this.fitness = 1 / (1 + 2 * tea + 2 * clas + 0.1 * clasDay + 0.02 * night);
+    this.fitness = 1 / (1 + 2 * tea + 2 * clas + 0.1 * clasDay + 0.02*night);
 
-    this.conflicts = [tea, clas, clasDay, night];
+    this.conflicts = [tea, clas, clasDay,night];
 
     return this.fitness;
 };

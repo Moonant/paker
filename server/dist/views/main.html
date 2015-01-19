@@ -1,4 +1,4 @@
-<navbar></navbar> <div class="container-fluid"> <div class="row"> <div class="col-sm-3 col-md-2 sidebar"> <ul class="nav nav-sidebar"> <li class="active"><a href="">院系<span class="sr-only">选中</span></a></li> <li ng-repeat="apartment in apartments"><!-- contain a apartment --> <ul class="nav"> <li> <a href="">{{ apartment.name }} <button type="button" class="close nav-close" ng-click="deleteApartment(apartment._id)" aria-label="Close"> <span aria-hidden="true">&times;</span> </button> </a> </li> <li ng-repeat="major in apartment.majors"><!-- contain a major --> <ul class="nav"> <li> <a href="">{{ major.name }} <button type="button" class="close nav-close" ng-click="deleteMajor(apartment._id, major._id)" aria-label="Close"> <span aria-hidden="true">&times;</span> </button> </a> </li> <li ng-repeat="class in major.classes"><!-- contain a class --> <ul class="nav"> <li> <a href="">{{ class.name }} <button type="button" class="close nav-close" ng-click="deleteClass(apartment._id, major._id, class._id)" aria-label="Close"> <span aria-hidden="true">&times;</span> </button> </a> </li> </ul> </li><!-- contain a class --> <li><ul class="nav"> <li ng-click="addClassDialog(apartment, major)"><a href="">添加班级</a></li> </ul></li> </ul> </li> <li><ul class="nav"> <li ng-click="addMajorDialog(apartment)"><a href="">添加专业</a></li> </ul></li> </ul> </li> <li><ul class="nav"> <li ng-click="addApartmentDialog()"><a href="">添加院系</a></li> </ul></li> </ul> <ul class="nav nav-sidebar"> <li class="active"><a href="">教师</a></li> <li ng-repeat="teacher in teachers"><!-- contain a teacher --> <ul class="nav"> <li> <a href="">{{ teacher.name }}({{ teacher._id }} - {{ teacher.apartment.name }}) <button type="button" class="close nav-close" ng-click="deleteTeacher(teacher._id)" aria-label="Close"> <span aria-hidden="true">&times;</span> </button> </a> </li> </ul> </li> <li ng-click="addTeacherDialog()"> <ul class="nav"> <li><a href="">添加教师</a></li> </ul> </li> </ul> </div><!-- .col-sm-3 --> <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2"> <div class="course-container col-sm-3 col-md-2" ng-repeat="course in courses"> <div class="thumbnail course"> <p><button type="button" class="close course-delete" aria-label="Close" ng-click="confirmDeleteDialog()"><span aria-hidden="true">&times;</span></button><br></p> <ul class="list-group"> <li class="list-group-item course-name active" ng-click="editCourse(course.id)">{{ course.name }}</li> <li class="list-group-item">教师: {{ course.teacher }}</li> <li class="list-group-item">院系: {{ course.apartment }}</li> <li class="list-group-item">专业: {{ course.major }}</li> <li class="list-group-item">时间: {{ course.time }}</li> </ul> </div><!--.course with margin --> </div><!-- .course-container --> </div> </div><!-- .row--> </div><!-- .container-fluid --> <!-- edit dialog --> <script type="text/ng-template" id="editDialog.html"><div class="modal-header">
+<navbar></navbar> <div class="container-fluid"> <div class="row"> <div class="col-sm-3 col-md-2 sidebar"> <ul class="nav nav-sidebar"> <li class="active"><a data-toggle="collapse" href="" data-target="#apartments">院系<span class="sr-only">选中</span></a></li> <div id="apartments" class="collapse in"> <li ng-repeat="apartment in apartments"><!-- contain a apartment --> <ul class="nav"> <li> <a data-toggle="collapse" data-target="#apartment-{{ apartment._id }}" href="">{{ apartment.name }} <button type="button" class="close nav-close" ng-click="deleteApartment(apartment._id)" aria-label="Close"> <span aria-hidden="true">&times;</span> </button> </a> </li> <div id="apartment-{{ apartment._id }}" class="collapse"> <li ng-repeat="major in apartment.majors"><!-- contain a major --> <ul class="nav"> <li> <a data-toggle="collapse" data-target="#major-{{ major._id }}" href="">{{ major.name }} <button type="button" class="close nav-close" ng-click="deleteMajor(apartment._id, major._id)" aria-label="Close"> <span aria-hidden="true">&times;</span> </button> </a> </li> <div id="major-{{ major._id }}" class="collapse"> <li ng-repeat="class in major.classes"><!-- contain a class --> <ul class="nav"> <li> <a href="">{{ class.name }} <button type="button" class="close nav-close" ng-click="deleteClass(apartment._id, major._id, class._id)" aria-label="Close"> <span aria-hidden="true">&times;</span> </button> </a> </li> </ul> </li><!-- contain a class --> <li><ul class="nav"> <li ng-click="addClassDialog(apartment, major)"><a href="">添加班级</a></li> </ul></li> </div> </ul> </li> <li><ul class="nav"> <li ng-click="addMajorDialog(apartment)"><a href="">添加专业</a></li> </ul></li> </div> </ul> </li> <li><ul class="nav"> <li ng-click="addApartmentDialog()"><a href="">添加院系</a></li> </ul></li> </div> </ul> <ul class="nav nav-sidebar"> <li data-toggle="collapse" data-target="#teachers" class="active"><a href="">教师</a></li> <div class="collapse in" id="teachers"> <li ng-repeat="teacher in teachers"><!-- contain a teacher --> <ul class="nav"> <li> <a href="">{{ teacher.name }}({{ teacher._id }} - {{ teacher.apartment.name }}) <button type="button" class="close nav-close" ng-click="deleteTeacher(teacher._id)" aria-label="Close"> <span aria-hidden="true">&times;</span> </button> </a> </li> </ul> </li> <li ng-click="addTeacherDialog()"> <ul class="nav"> <li><a href="">添加教师</a></li> </ul> </li> </div> </ul> </div><!-- .col-sm-3 --> <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2"> <h3>所有课程</h3> <table id="courses-table" class="table table-striped"> <tr> <th>编号 <th>课程名称 <th>性质 <th>课程类别 <th>学时 <th>院系 <th>专业 <th>年级 <th>班级 <th>周数 <th>上课时间  <tr ng-repeat="course in courses"> <td>{{ course._id || '' }} <td>{{ course.name || '' }} <td>{{ course.type.name }} <td>{{ course.category.name }} <td>{{ course.intermHours }} <td>{{ course.apartment.name || '' }} <td>{{ course.major.name }} <td>{{ course.grade.name }} <td>{{ course.classesName }} <td>{{ course.arrange.weeksName }} <td>{{ course.arrange.timeNPlaceName }}  </table> </div> </div><!-- .row--> </div><!-- .container-fluid --> <!-- edit dialog --> <script type="text/ng-template" id="editDialog.html"><div class="modal-header">
     <button type="button" class="close" ng-click="cancel()" aria-label="Close"><span aria-hidden="true">&times;</span></button>
     <h4 class="modal-title" id="exampleModalLabel">编辑课程</h4>
   </div><!-- modal-header -->
@@ -35,7 +35,7 @@
     <form ng-submit="ok()">
       <div class="form-group">
         <label class="control-label" >请输入院系名称:</font></label>
-        <input type="text" class="form-control" ng-model="apartmentName"></input>
+        <input type="text" ng-required class="form-control" ng-model="apartmentName"></input>
       </div>
     </form>
   </div>
@@ -51,7 +51,7 @@
     <form ng-submit="ok()">
       <div class="form-group">
         <label class="control-label" >请输入专业名称:</font></label>
-        <input type="text" class="form-control" ng-model="majorName"></input>
+        <input type="text" ng-required class="form-control" ng-model="majorName"></input>
       </div>
     </form>
   </div>
@@ -67,9 +67,9 @@
     <form ng-submit="ok()">
       <div class="form-group">
         <label class="control-label" >请输入班级名称:</label>
-        <input type="text" class="form-control" ng-model="className"></input>
+        <input type="text" ng-required class="form-control" ng-model="className"></input>
         <label class="control-label" >年级:</label>
-        <select type="text" ng-options="grade as grade.name for grade in grades" class="form-control" ng-model="selectedGrade"></select>
+        <select type="text" ng-required ng-options="grade as grade.name for grade in grades" class="form-control" ng-model="selectedGrade"></select>
       </div>
     </form>
   </div>
@@ -85,11 +85,11 @@
     <form ng-submit="ok()">
       <div class="form-group">
         <label class="control-label">所属院系:</label>
-        <select ng-model="apartment" ng-options="apartment as apartment.name for apartment in apartments" class="form-control"></select>
+        <select ng-model="apartment" ng-required ng-options="apartment as apartment.name for apartment in apartments" class="form-control"></select>
       </di>
       <div class="form-group">
         <label class="control-label" >请输入教师姓名:</label>
-        <input type="text" class="form-control" ng-model="teacherName"></input>
+        <input type="text" class="form-control" ng-required ng-model="teacherName"></input>
       </div>
     </form>
   </div>
