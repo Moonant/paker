@@ -29,7 +29,7 @@ var courseSchema = new Schema({
   classes: [ 
     { 
       _id: { type: Number, unique: false },
-      name: { tyep: String }
+      name: { type: String }
     }
   ],
   classesName: { type: String }, // needed to show the classes// 

@@ -7,7 +7,7 @@ var router = express.Router();
 function parseXlsx(filename) {
     var result = {};
     try {
-        result.obj = xlsx.parse(__dirname + '/plan2.xlsx'); // parses a file
+        result.obj = xlsx.parse(__dirname + '/plan.xlsx'); // parses a file
         addCoursesToDB(result.obj);
         result.status = true;
     } catch (e) {
