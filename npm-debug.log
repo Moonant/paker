@@ -1,8 +1,7 @@
 0 info it worked if it ends with ok
 1 verbose cli [ '/home/ant/.nvm/v0.10.32/bin/node',
 1 verbose cli   '/home/ant/.nvm/v0.10.32/bin/npm',
-1 verbose cli   'test',
-1 verbose cli   '--debug' ]
+1 verbose cli   'test' ]
 2 info using npm@1.4.28
 3 info using node@v0.10.32
 4 error Error: ENOENT, open '/home/ant/Paker/app/packer/package.json'
@@ -10,7 +9,7 @@
 5 error including the npm and node versions, at:
 5 error     <http://github.com/npm/npm/issues>
 6 error System Linux 3.2.0-58-generic-pae
-7 error command "/home/ant/.nvm/v0.10.32/bin/node" "/home/ant/.nvm/v0.10.32/bin/npm" "test" "--debug"
+7 error command "/home/ant/.nvm/v0.10.32/bin/node" "/home/ant/.nvm/v0.10.32/bin/npm" "test"
 8 error cwd /home/ant/Paker/app/packer
 9 error node -v v0.10.32
 10 error npm -v 1.4.28
