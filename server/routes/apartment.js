@@ -39,6 +39,7 @@ router.post('/apartments/:aptid/majors/:mjid/classes', auth, function(req, res) 
   
   // callback for the find operation
   var docCallback = function(err, doc) {
+    if(err) console.log('add class' + err);
     var majors = doc.majors;
     // filter for mjid specified majors  
     var filt = function(major) {

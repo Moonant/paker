@@ -20,7 +20,6 @@ router.post('/courses', auth, function(req, res) {
     if(err) console.log('post /course' + err);
   });
   var newCourse = new Course(req.body);
-  console.dir(req.body);
   var invalid = newCourse.name === null;
   invalid = invalid || newCourse.intermHours === null;
   invalid = invalid || newCourse.isCompulsory === null;
@@ -53,7 +52,7 @@ router.get('/courses', auth, function(req, res) {
   });
 });
 
-// delete a apartment
+// delete a course
 router.delete('/courses/:crsid', auth, function(req, res) {
   var crsid = req.params.crsid;
   var connStr = 'mongodb://localhost:27017/packer';
@@ -64,6 +63,26 @@ router.delete('/courses/:crsid', auth, function(req, res) {
     if(err) console.log('delete course' + err);
     res.end();
     mongoose.connection.close();
+  });
+});
+
+// update a course
+router.put('/courses/:crsid', auth, function(req, res) {
+  var crsid = req.params.crsid;
+  var updatedCourse = req.body;
+  var connStr = 'mongodb://localhost:27017/packer';
+  mongoose.connect(connStr, function(err) {
+    if(err) console.log('update course' + err);
+  });
+  Course.findOne({ _id: crsid }, function(err, course) {
+    if(err) console.log('update course' + err);
+    for(var attr in updatedCourse) {
+      course[attr] = updatedCourse[attr];
+    }
+    course.save(function() {
+      mongoose.connection.close();
+    });
+    res.end();
   });
 });
 
