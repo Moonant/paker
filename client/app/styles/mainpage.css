@@ -155,4 +155,7 @@ button.course-delete {
 .form-inline {
   display: inline-block; }
 
+.glyphicon {
+  cursor: pointer; }
+
 /*# sourceMappingURL=mainpage.css.map */
