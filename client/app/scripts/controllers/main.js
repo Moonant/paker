@@ -13,6 +13,101 @@ function MainCtrl($q, $resource, $scope, $location,
 
   $scope.user = new Auth();  
   $scope.user.$check();
+  $scope.allCourses = true;
+  $scope.classCourses = false;
+  $scope.teacherCourses = false;
+
+  $scope.showAllCourses = function() {
+    $scope.allCourses = true;
+    $scope.classCourses = false;
+  };
+  $scope.shownCourses = [];
+  $scope.showClassCourses = function(apartment, major, cls) {
+    $scope.shownCourses = [
+      { 
+        name: '1-2',
+        // contain a row courses
+        courses: [ [], [], [], [], [] ]
+      },
+      {
+        name: '3-4',
+        courses: [ [], [], [], [], [] ]
+      },
+      {
+        name: '5-6',
+        courses: [ [], [], [], [], [] ]
+      },
+      {
+        name: '7-8',
+        courses: [ [], [], [], [], [] ]
+      },
+      {
+        name: '9-10',
+        courses: [ [], [], [], [], [] ]
+      },
+      {
+        name: '11-12',
+        courses: [ [], [], [], [], [] ]
+      }
+    ];
+    $scope.allCourses = false;
+    $scope.classCourses = true;
+
+    $scope.shownClass = cls;
+    $scope.shownApartment = apartment;
+    $scope.shownMajor = major;
+    var aptid = apartment._id;
+    var mjid = major._id;
+    var clsid = cls._id;
+
+    // filt all the courses of specified class
+    var filt = function(course) {
+      if(course.apartment._id !== aptid) { return false; }
+      if(course.major._id !== mjid) { return false; }
+      var cls = course.classes.filter(function(cls) {
+        return cls._id === clsid;
+      });
+      return cls[0] !== undefined;
+    };
+    var courses = $scope.courses.filter(filt);
+    //console.dir(courses);
+    courses.forEach(function(course) {
+      course.arrange.timeNPlace.forEach(function(timeNPlace) {
+        var c = {};
+        c._id = course._id;
+        c.title = course.name;
+        c.drag = true;
+        $scope
+          .shownCourses[timeNPlace.position._id]
+          .courses[timeNPlace.weekday._id - 1]
+          .push(c);
+      });
+    });
+  };
+
+  // drag stopped, check for conflict
+  $scope.stop = function(event) {
+    // grab the course
+    console.dir($(event.currentTarget));
+    var item = $(event.target).scope();
+    var course = $scope.courses.filter(function(course) {
+      return course._id === item.course._id;
+    })[0];
+  };
+
+  $scope.checkConflict = function(){
+    console.log('fuck');
+    $scope.shownCourses.forEach(function(row) {
+      row.courses.forEach(function(courses) {
+        if(courses.length >= 2) {
+          console.log('conflict');
+        }
+      });
+    });
+  };
+
+  $scope.saveClassCourses = function() {
+  };
 
   // apply for apartments' data
   $scope.getApartments = function() {
@@ -305,13 +400,29 @@ MainCtrl.$inject = ['$q', '$resource', '$scope', '$location', '$modal',
   'Auth', 'Apartment', 'Major', 'Cls', 'Teacher', 'Course'];
 
 // EditCoureseDialogCtrl
-function EditCourseDialogCtrl($scope, $modalInstance, course, grades, apartments, teachers) {
+function EditCourseDialogCtrl($scope, $modalInstance, Course, course, grades, apartments, teachers) {
   //console.dir(course);
   $scope.grades = grades;
   $scope.apartments = apartments;
   $scope.teachers = teachers;
   $scope.course = course;
-  console.dir($scope.course);
+  apartments.forEach(function(apt) {
+    if(apt._id === course.apartment._id) { $scope.course.apartment = apt; }
+  });
+  $scope.course.apartment.majors.forEach(function(mj) {
+    if(mj._id === $scope.course.major._id) { $scope.course.major = mj; }
+  });
+  var classes = [];
+  $scope.course.major.classes.forEach(function(cls) {
+    $scope.course.classes.forEach(function(selectedCls) {
+      if(selectedCls._id === cls._id) { cls.isSelected = true; }
+    });
+    classes.push(cls);
+  });
+  $scope.classes = classes;
+  grades.forEach(function(grade) {
+    if(grade._id === $scope.course.grade._id) { $scope.course.grade = grade; }
+  });
 
   // 4th section 
   $scope.tipHide = false;
@@ -380,10 +491,22 @@ function EditCourseDialogCtrl($scope, $modalInstance, course, grades, apartments
     { isCompulsory: false, name: '选修' },
     { isCompulsory: true, name: '必修' }
   ];
+  if($scope.course.type.isCompulsory){
+    $scope.course.type = $scope.comOpts[1];
+  }
+  else {
+    $scope.course.type = $scope.comOpts[1];
+  }
+
   $scope.categories = [
     { _id: 0, name: '通识教育课程' },
     { _id: 1, name: '学科基础教程' }
   ];
+  $scope.categories.forEach(function(cat) {
+    if(cat._id === $scope.course.category._id) {
+      $scope.course.category = cat;
+    }
+  });
   $scope.$watch('course.teacher._id', function() {
     var filt = function(item) {
       return item._id === parseInt($scope.course.teacher._id);
@@ -418,7 +541,11 @@ function EditCourseDialogCtrl($scope, $modalInstance, course, grades, apartments
     $scope.course.classes.forEach(function(cls) {
       $scope.course.classesName += cls.name + ' ';
     });
-    $scope.course.$save(function() {
+    var course = new Course();
+    for(var attrname in $scope.course) {
+      course[attrname] = $scope.course[attrname];
+    }
+    course.$update({ crsid: $scope.course._id }, function() {
       $modalInstance.close();
     });
   };
@@ -426,7 +553,7 @@ function EditCourseDialogCtrl($scope, $modalInstance, course, grades, apartments
     $modalInstance.dismiss('cancel');
   };
 }
-EditCourseDialogCtrl.$inject = ['$scope', '$modalInstance', 'course', 'grades', 'apartments', 'teachers'];
+EditCourseDialogCtrl.$inject = ['$scope', '$modalInstance', 'Course', 'course', 'grades', 'apartments', 'teachers'];
 
 // Controller for add apartment dialog
 function AddApartmentDialogCtrl($scope, $modalInstance) {
@@ -705,7 +832,7 @@ function AddTeacherDialogCtrl($scope, $modalInstance, apartments) {
 AddTeacherDialogCtrl.$inject = ['$scope', '$modalInstance', 'apartments'];
 
 var dependences = ['authenticationServices', 'apartmentServices',
-  'teacherServices', 'courseServices'];
+  'teacherServices', 'courseServices', 'ngDragDrop'];
 angular.module('mainControllers', dependences)
   .controller('MainCtrl', MainCtrl)
   .controller('ConfirmDialogCtrl', ConfirmDialogCtrl)

@@ -64,7 +64,8 @@ var courseSchema = new Schema({
         _id: { type: Number, unique: false },
         name: { type: String }
       },
-      classrome: { type: String }
+      classrome: { type: String },
+      name: { type: String }
     }],
     timeNPlaceName: { type: String },
     weeksName: { type: String }  // needed to show the weeks// 

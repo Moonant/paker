@@ -5,6 +5,7 @@
 
 function Course($resource){
   var options = {
+    update: { method: 'PUT' }
   };
   return $resource('/courses/:crsid',
     { crsid: '' },

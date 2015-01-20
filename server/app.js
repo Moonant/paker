@@ -22,12 +22,12 @@ var app = express();
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(cookieParser('securedsession'));
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({extended: false}));
 app.use(session({
   secret: 'securedsession',
   resave: false,
   saveUninitialized: true,
-  }));
+}));
 app.use(passport.initialize()); // Add passport initialization
 app.use(passport.session()); // Add passport initialization
 
@@ -36,16 +36,16 @@ app.use(passport.session()); // Add passport initialization
 // development error handler
 // will print stacktrace
 if (app.get('env') === 'development') {
-    app.use(express.static(path.join(__dirname, '../client')));
-    app.use(express.static(path.join(__dirname, '../client/.tmp')));
-    app.use(express.static(path.join(__dirname, '../client/app')));
-    app.use(function(err, req, res, next) {
-        res.status(err.status || 500);
-        res.render('error', {
-            message: err.message,
-            error: err
-        });
+  app.use(express.static(path.join(__dirname, '../client')));
+  app.use(express.static(path.join(__dirname, '../client/.tmp')));
+  app.use(express.static(path.join(__dirname, '../client/app')));
+  app.use(function (err, req, res, next) {
+    res.status(err.status || 500);
+    res.render('error', {
+      message: err.message,
+      error: err
     });
+  });
 }
 
 if (app.get('env') === 'production') {
@@ -53,12 +53,12 @@ if (app.get('env') === 'production') {
   app.use(express.static(path.join(__dirname, '/dist')));
   // production error handler
   // no stacktraces leaked to user
-  app.use(function(err, req, res, next) {
+  app.use(function (err, req, res, next) {
     app.use(express.static(path.join(__dirname, 'dist/')));
     res.status(err.status || 500);
     res.render('error', {
-        message: err.message,
-        error: {}
+      message: err.message,
+      error: {}
     });
   });
 }
@@ -72,10 +72,10 @@ app.use(alg);
 app.use(xlsx);
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
-    var err = new Error('Not Found');
-    err.status = 404;
-    next(err);
+app.use(function (req, res, next) {
+  var err = new Error('Not Found');
+  err.status = 404;
+  next(err);
 });
 
 module.exports = app;
