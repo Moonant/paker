@@ -317,6 +317,19 @@ function MainCtrl($q, $resource, $scope, $location, $rootScope,
     modalInstance
       .result
       .then(function(apartmentName) {
+        if(apartmentName === '') {
+          $modal.open({
+            templateUrl: 'confirmDialog.html',
+            controller: 'ConfirmDialogCtrl',
+            resolve: {
+              msg: function() {
+                return '失败';
+              }
+            },
+            size: 'sm'
+          });
+          return;
+        }
         var apartment = new Apartment();
         apartment.name = apartmentName;
         apartment.$save(function(){
@@ -356,6 +369,19 @@ function MainCtrl($q, $resource, $scope, $location, $rootScope,
       size: 'sm'
     });
     modalInstance.result.then(function(majorName) {
+      if(majorName === '') {
+        $modal.open({
+          templateUrl: 'confirmDialog.html',
+          controller: 'ConfirmDialogCtrl',
+          resolve: {
+            msg: function() {
+              return '失败';
+            }
+          },
+          size: 'sm'
+        });
+        return;
+      }
       var newMajor = new Major();
       newMajor.major = { 
         name: majorName
@@ -378,6 +404,19 @@ function MainCtrl($q, $resource, $scope, $location, $rootScope,
       size: 'sm'
     });
     modalInstance.result.then(function(cls) {
+      if(cls.name === '' || cls.grade._id === undefined) {
+        $modal.open({
+          templateUrl: 'confirmDialog.html',
+          controller: 'ConfirmDialogCtrl',
+          resolve: {
+            msg: function() {
+              return '失败';
+            }
+          },
+          size: 'sm'
+        });
+        return;
+      }
       var newClass = new Cls();
       newClass.class = cls;
       newClass.$save({ aptid: apartment._id, mjid: major._id },
@@ -404,12 +443,16 @@ function MainCtrl($q, $resource, $scope, $location, $rootScope,
       $scope.getCourses();
     });
   };
+
   // excel upload dialog called every upload clicked
   $scope.uploadExcelDialog = function() {
-    $modal.open({
+    var modalInstance = $modal.open({
       templateUrl: 'uploadDialog.html',
       controller: 'UploadDialogCtrl',
       size: 'lg'
+    });
+    modalInstance.result.then(function() {
+      $scope.getCourses();
     });
   };
 
@@ -637,19 +680,29 @@ function ConfirmDialogCtrl($scope, $modalInstance, msg) {
 ConfirmDialogCtrl.$inject = ['$scope', '$modalInstance', 'msg'];
 
 // Controller for UploadDialog
-function UploadDialogCtrl($scope, $modalInstance, $upload) {
+function UploadDialogCtrl($scope, $modalInstance, $upload, $modal) {
   $scope.excelFile = null;
   $scope.upload = function(){
-    console.dir($scope.excelFile);
     var file = $scope.excelFile[0];
     $scope.upload = $upload.upload({
       url: 'upload',
       method: 'POST',
       file: file
-    }).progress(function(evt) {
-      console.log('progress: ' + parseInt(100.0 * evt.loaded / evt.total) + '% file: ' + evt.config.file.name);
-    }).success(function() {
-      console.log('success!');
+    }).success(function(data) {
+      console.dir(data);
+      $modalInstance.close();
+      if(data.status) {
+        $modal.open({
+          templateUrl: 'confirmDialog.html',
+          controller: 'ConfirmDialogCtrl',
+          resolve: {
+            msg: function() {
+              return '上传成功!';
+            }
+          },
+          size: 'sm'
+        });
+      }
     });
   };
   // *****
@@ -657,7 +710,7 @@ function UploadDialogCtrl($scope, $modalInstance, $upload) {
     $modalInstance.dismiss('cancel');
   };
 }
-UploadDialogCtrl.$inject = ['$scope', '$modalInstance', '$upload'];
+UploadDialogCtrl.$inject = ['$scope', '$modalInstance', '$upload', '$modal'];
 
 // Controller for add course dialog
 function AddCourseDialogCtrl($scope, $modalInstance, Apartment, 

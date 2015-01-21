@@ -196,3 +196,21 @@
     <button class="btn btn-primary" ng-click="ok()">确定</button>
   </div>
 </script>
+
+<!-- process dialog -->
+<script type="text/ng-template" id="processDialog.html">
+  <div class="modal-header">
+    <button type="button" class="close" ng-click="cancel()" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    <h4 class="modal-title">{{title}}</h4>
+  </div><!-- modal-header -->
+
+  <div class="modal-body">
+    <p> {{ filename }}</p>
+    <progressbar class="progress-striped active" max="100" value="processValue" type="success"></progressbar>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-default" ng-click="cancel()">取消</button>
+    <button class="btn btn-primary" ng-click="ok()">确定</button>
+  </div>
+</script>

@@ -152,7 +152,7 @@
       <!-- 1st section -->
       <div class="row form-group"><!-- courseName, selectedApartment, selectedMajor, selectedGrade; apartments and grades is needed -->
         <div class="col-sm-2">
-          <label class="control-label">课程名称:</label>
+          <label class="control-label">课程名称(*):</label>
           <input type="text" class="form-control" ng-required ng-model="course.name"></input>
         </div>
         <div class="col-sm-2">
@@ -164,11 +164,11 @@
           <select class="form-control" ng-options="major as major.name for major in course.apartment.majors" ng-model="course.major"></select>
         </div>
         <div class="col-sm-2">
-          <label class="control-label">年级:</label>
+          <label class="control-label">年级(*):</label>
           <select ng-options="grade as grade.name for grade in grades" class="form-control" ng-model="course.grade"></select>
         </div>
         <div class="col-sm-2">
-          <label class="control-label">课程性质:</label>
+          <label class="control-label">课程性质(*):</label>
           <select class="form-control" ng-options="com as com.name for com in comOpts" ng-model="course.type"></select>
         </div>
         <div class="col-sm-2">
@@ -188,7 +188,7 @@
           <input class="form-control" ng-model="course.onlineHours"></input>
         </div>
         <div class="col-sm-2">
-          <label class="control-label">本学期总学时:</label>
+          <label class="control-label">本学期总学时(*):</label>
           <input class="form-control" ng-required ng-model="course.intermHours"></input>
         </div>
         <div class="col-sm-2">
@@ -216,11 +216,11 @@
       <!-- 5th section -->
       <div class="row form-group"><!-- teacherId, teacherName -->
         <div class="col-sm-2">
-          <label class="control-label">教师代号:</label>
+          <label class="control-label">教师代号(*):</label>
           <input ng-required type="text" class="form-control" ng-model="course.teacher._id"></input>
         </div>
         <div class="col-sm-2">
-          <label class="control-label">教师姓名:</label>
+          <label class="control-label">教师姓名(*):</label>
           <input ng-required type="text" ng-readonly="isReadonly" class="form-control" ng-model="course.teacher.name"></input>
         </div>
         <div class="col-sm-2">
