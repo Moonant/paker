@@ -47,6 +47,7 @@ var courseSchema = new Schema({
     _id: {type: Number, unique: false},
     name: {type: String}
   },
+  isChecked: { type: Boolean },
   arrange: {
     weekSecs: [{
       endweek: {type: Number},

@@ -56,12 +56,24 @@ function MainCtrl($q, $resource, $scope, $location, $rootScope,
     });
   };
 
+  // check box changed 
+  $scope.changeCheckStatus = function(crsid) {
+    var course = $scope.courses.filter(function(course) {
+      return course._id === crsid;
+    })[0];
+    var updatedCourse = new Course();
+    for(var attrname in course) {
+      updatedCourse[attrname] = course[attrname];
+    }
+    updatedCourse.$update({ crsid: course._id }, function() {
+    });
+  };
+
   // start to manage 
   $scope.packer = function() {
     var Packer = $resource('/alg/packer');
     Packer.get(function(data) {
       if(data.isPackering !== true) { return; }
-      console.dir(data);
       var modalInstance = $modal.open({
         templateUrl: 'processDialog.html',
         controller: function($scope, $modalInstance) {
@@ -75,7 +87,7 @@ function MainCtrl($q, $resource, $scope, $location, $rootScope,
           var Status = $resource('/alg/packer/status');
           Status.get(function(data) {
             if(data.process === 1) {
-              $scope.tip='排课完成'; 
+              $scope.tip='排课完成, 冲突检测:' + data.conflicts; 
               $scope.isButtonDisabled = false;
               clearInterval(interval); 
             }
@@ -143,7 +155,7 @@ function MainCtrl($q, $resource, $scope, $location, $rootScope,
     // filt all the courses of specified class
     var filt = function(course) {
       if(!course.apartment ) {
-        return;
+        return false;
       }
       if(course.apartment._id !== aptid) { return false; }
       if(course.major._id !== mjid) { return false; }
@@ -153,14 +165,16 @@ function MainCtrl($q, $resource, $scope, $location, $rootScope,
       return cls[0] !== undefined;
     };
     var courses = $scope.courses.filter(filt);
-    console.dir(courses);
     courses.forEach(function(course) {
       for(var i=0; i<course.arrange.timeNPlace.length; i++) {
         var timeNPlace = course.arrange.timeNPlace[i];
         var c = {};
         c._id = course._id;
         c._tid = course.teacher._id;
+        c.aptid = course.apartment._id;
+        c.mjid = course.major._id;
         c.title = course.name;
+        c.clsid = clsid;
         c.arrange = course.arrange;
         c.drag = true;
         c.preindex = i;
@@ -182,8 +196,90 @@ function MainCtrl($q, $resource, $scope, $location, $rootScope,
     updatedCourse.weekday = columnIndex + 1;
     updatedCourse.position = rowIndex;
     updatedCourse.preindex = course.preindex;
-    console.dir(updatedCourse);
-    updatedCourse.$update({ crsid: course._id }, function() {
+    //console.dir(updatedCourse);
+    updatedCourse.$update({ crsid: course._id }, function(data) {
+      if(data.isConfict === true) {
+        $modal.open({
+          templateUrl: 'confirmDialog.html',
+          controller: 'ConfirmDialogCtrl',
+          resolve: {
+            msg: function() {
+              return data.msg;
+            }
+          },
+          size: 'sm'
+        });
+        $scope.shownCourses = [
+          { 
+            name: '1-2',
+            _id: 0,
+            // contain a row courses
+            courses: [ [], [], [], [], [] ]
+          },
+          {
+            name: '3-4',
+            _id: 1,
+            courses: [ [], [], [], [], [] ]
+          },
+          {
+            name: '5-6',
+            _id: 2,
+            courses: [ [], [], [], [], [] ]
+          },
+          {
+            name: '7-8',
+            _id: 3,
+            courses: [ [], [], [], [], [] ]
+          },
+          {
+            name: '9-10',
+            _id: 4,
+            courses: [ [], [], [], [], [] ]
+          },
+          {
+            name: '11-12',
+            _id: 5,
+            courses: [ [], [], [], [], [] ]
+          }
+        ];
+
+        var aptid = course.aptid;
+        var mjid = course.mjid;
+        var clsid = course.clsid;
+
+        // filt all the courses of specified class
+        var filt = function(course) {
+          if(!course.apartment ) {
+            return;
+          }
+          if(course.apartment._id !== aptid) { return false; }
+          if(course.major._id !== mjid) { return false; }
+          var cls = course.classes.filter(function(cls) {
+            return cls._id === clsid;
+          });
+          return cls[0] !== undefined;
+        };
+        var courses = $scope.courses.filter(filt);
+        courses.forEach(function(course) {
+          for(var i=0; i<course.arrange.timeNPlace.length; i++) {
+            var timeNPlace = course.arrange.timeNPlace[i];
+            var c = {};
+            c._id = course._id;
+            c._tid = course.teacher._id;
+            c.aptid = aptid;
+            c.mjid = mjid;
+            c.clsid = clsid;
+            c.title = course.name;
+            c.arrange = course.arrange;
+            c.drag = true;
+            c.preindex = i;
+            $scope
+              .shownCourses[timeNPlace.position._id]
+              .courses[timeNPlace.weekday._id - 1]
+              .push(c);
+          }
+        });
+      }
     });
     /*
     var checkTeacherConflict = function(row, column) {
@@ -525,10 +621,40 @@ function MainCtrl($q, $resource, $scope, $location, $rootScope,
     var modalInstance = $modal.open({
       templateUrl: 'uploadDialog.html',
       controller: 'UploadDialogCtrl',
+      resolve: {
+        apartments: $scope.getApartmentsValue
+      },
       size: 'lg'
     });
     modalInstance.result.then(function() {
       $scope.getCourses();
+    });
+  };
+
+  // excel download dialog called every upload clicked
+  $scope.downloadExcelDialog = function() {
+    $modal.open({
+      templateUrl: 'outportDialog.html',
+      controller: 'OutportDialogCtrl',
+      resolve: {
+        apartments: $scope.getApartmentsValue
+      },
+      size: 'lg'
+    });
+  };
+
+  $scope.inputWeeks = function() {
+    $modal.open({
+      templateUrl: 'inputWeeks.html',
+      controller: function($scope, $modalInstance) {
+        $scope.ok = function() {
+          $modalInstance.close();
+        };
+        $scope.cancel = function() {
+          $modalInstance.dismiss();
+        };
+      },
+      size: 'sm'
     });
   };
 
@@ -764,21 +890,27 @@ function ConfirmDialogCtrl($scope, $modalInstance, msg) {
 ConfirmDialogCtrl.$inject = ['$scope', '$modalInstance', 'msg'];
 
 // Controller for UploadDialog
-function UploadDialogCtrl($scope, $modalInstance, $upload, $modal) {
+function UploadDialogCtrl($scope, $modalInstance, $upload, $modal, apartments) {
+  $scope.apartments = apartments;
+  $scope.apartment = null;
+  $scope.major = null;
   $scope.excelFile = null;
   $scope.upload = function(){
+    if($scope.apartment === null || $scope.major === null) {
+      return;
+    }
     var file = $scope.excelFile[0];
     $scope.upload = $upload.upload({
       url: 'upload',
       method: 'POST',
       file: file
     }).success(function(data) {
-      console.dir(data);
       $modalInstance.close();
       if(data.status) {
         $modal.open({
           templateUrl: 'confirmDialog.html',
           controller: 'ConfirmDialogCtrl',
+          data: { aptid: $scope.apartment._id, mjid: $scope.major._id},
           resolve: {
             msg: function() {
               return '上传成功!';
@@ -794,7 +926,19 @@ function UploadDialogCtrl($scope, $modalInstance, $upload, $modal) {
     $modalInstance.dismiss('cancel');
   };
 }
-UploadDialogCtrl.$inject = ['$scope', '$modalInstance', '$upload', '$modal'];
+UploadDialogCtrl.$inject = ['$scope', '$modalInstance', '$upload', '$modal', 'apartments'];
+
+// Controller for outport 
+function OutportDialogCtrl($scope, $modalInstance, $upload, $modal, apartments) {
+  $scope.apartments = apartments;
+  $scope.apartment = null;
+  $scope.major = null;
+  // *****
+  $scope.cancel = function() {
+    $modalInstance.dismiss('cancel');
+  };
+}
+OutportDialogCtrl.$inject = ['$scope', '$modalInstance', '$upload', '$modal', 'apartments'];
 
 // Controller for add course dialog
 function AddCourseDialogCtrl($scope, $modalInstance, Apartment, 
@@ -945,6 +1089,7 @@ function AddCourseDialogCtrl($scope, $modalInstance, Apartment,
       return;
     }
     $scope.course.arrange.weeksName = '';
+    $scope.course.isChecked = false;
     $scope.course.arrange.weekSecs.forEach(function(weekSec) {
       $scope.course.arrange.weeksName += weekSec.name + ' ';
     });
@@ -1072,4 +1217,5 @@ angular.module('mainControllers', dependences)
   .controller('AddClassDialogCtrl', AddClassDialogCtrl)
   .controller('AddTeacherDialogCtrl', AddTeacherDialogCtrl)
   .controller('AddGradeDialogCtrl', AddGradeDialogCtrl)
+  .controller('OutportDialogCtrl', OutportDialogCtrl)
   .controller('EditCourseDialogCtrl', EditCourseDialogCtrl);

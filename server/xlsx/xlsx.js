@@ -112,7 +112,7 @@ function buildXlsx(res) {
 //  res.send(parseXlsx());
 //});
 
-router.get('/xlsx/build/', function (req, res) {
+router.get('/xlsx/build/:aptid', function (req, res) {
   buildXlsx(res);
 });
 
