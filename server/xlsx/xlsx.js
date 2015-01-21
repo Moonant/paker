@@ -8,9 +8,9 @@ var router = express.Router();
 function parseXlsx(filename) {
   var result = {};
   try {
+    result.status = true;
     result.obj = xlsx.parse(__dirname + '/plan.xlsx'); // parses a file
     addCoursesToDB(result);
-    result.status = true;
   } catch (e) {
     result.status = false;
     if (result.msg)
@@ -33,7 +33,8 @@ function addCoursesToDB(result) {
       newCourse.classesName = c[0];
       newCourse.type = {};
       newCourse.type.isCompulsory = (c[1] == "必修");
-      newCourse.type.name = c[2];
+      newCourse.type.name = c[1];
+      newCourse.category.name = c[2];
       newCourse.onlineHours = c[5];
       newCourse.lectureHours = c[4];
       newCourse.intermHours = c[8];
@@ -51,11 +52,65 @@ function addCoursesToDB(result) {
   mongoose.connection.close();
 }
 
+function getXlsxData(docs) {
+  //return xlsx.parse(__dirname + '/out.xlsx');
+
+  var data = [];
+  data[0] = [];
+  data[0][1] = "华中科技大学";
+  data[1] = ["周 次", null, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22];
+  data[2] = ["教学进程", null, "上    课", null, null, null, null, null, null, null, null, null, null, null, "考 试", "上    课", null, null, null, null, null, null, null, "考试"];
+  data[3] = ["课程名称", null];
+  data[4] = ["学时数", null];
+  data[5] = ["学 分", null];
+
+  for (var i = 6; i < 11; i++) {
+    data[i] = [];
+    for (var j = 0; j < 6; j++) {
+      data[i][j] = "";
+      for (var z = 0; z < docs.length; z++) {
+        var t = docs[z].arrange.timeNPlace;
+        for (var x = 0; x < t.length; x++) {
+          if (t[x].weekday._id == i - 5 && t[x].position._id == j) {
+            var c = docs[z].name + docs[z].arrange.timeNPlaceName;
+            data[i][j] += c;
+          }
+        }
+      }
+    }
+  }
+  return data;
+}
+
+function buildXlsx(res) {
+  var result = {status: false};
+  var fs = require('fs');
+  var connStr = 'mongodb://localhost:27017/packer';
+  mongoose.connect(connStr, function (err) {
+    if (err) console.log('delete major' + err);
+  });
+  Course.find(function (err, docs) {
+    var data = getXlsxData(docs);
+    var buffer = xlsx.build([{name: "课表", data: data}]); // returns a buffer
+    var filename = __dirname + 'outtable.xlsx';
+    fs.writeFileSync(filename, buffer, 'binary');
+    result.filename = filename;
+    result.status = true;
+    res.send(result);
+    mongoose.connection.close();
+  });
+}
+
 
 // Test
-router.get('/xlsx', function (req, res) {
+router.get('/xlsx/parse', function (req, res) {
   res.send(parseXlsx());
 });
+
+router.get('/xlsx/build/', function (req, res) {
+  buildXlsx(res);
+});
+
 
 //var obj = xlsx.parse(fs.readFileSync(__dirname + '/myFile.xlsx')); // parses a buffer
 //
