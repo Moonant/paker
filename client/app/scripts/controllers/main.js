@@ -626,7 +626,6 @@ function MainCtrl($q, $resource, $scope, $location, $rootScope,
       controller: 'UploadDialogCtrl',
       resolve: {
         apartments: function() {
-          console.dir($scope.getApartmentsValue());
           return $scope.getApartmentsValue();
         }
       },
@@ -912,6 +911,7 @@ function UploadDialogCtrl($scope, $resource, $modalInstance, $upload, $modal, ap
       method: 'POST',
       file: file
     }).success(function(data) {
+      console.dir(data);
       $modalInstance.close();
       if(data.status) {
         $modal.open({

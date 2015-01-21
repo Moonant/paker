@@ -15,10 +15,17 @@ function parseXlsx(filename, req, res) {
   });
   Apartment.findOne({'_id': aptid}, function (err, doc) {
     var result = {};
+    var outma = {};
+    for(var i=0;i<doc.majors.length;i++){
+      if(mjid==doc.majors[i]._id){
+        outma._id = doc.majors[i]._id;
+        outma.name = doc.majors[i].name;
+      }
+    } 
     try {
       result.status = true;
       result.obj = xlsx.parse(filename); // parses a file
-      addCoursesToDB(result, res, doc, mjid);
+      addCoursesToDB(result, res, doc, outma);
     } catch (e) {
       mongoose.connection.close();
       result.status = false;
@@ -53,7 +60,7 @@ function addCoursesToDB(result, res, doc, mjid) {
       newCourse.totalHours = c[3];
       newCourse.isChecked = false;
       newCourse.apartment = {_id: doc._id, name: doc.name};
-      newCourse.major = {_id: doc.majors[mjid]._id, name: doc.majors[mjid].name};
+      newCourse.major = {_id: mjid._id, name: mjid.name};
 
       newCourses.push(newCourse);
     }
