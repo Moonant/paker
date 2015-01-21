@@ -907,7 +907,7 @@ function UploadDialogCtrl($scope, $resource, $modalInstance, $upload, $modal, ap
     }
     var file = $scope.excelFile[0];
     $scope.upload = $upload.upload({
-      url: 'upload',
+      url: 'upload/apartments/'+$scope.apartment._id+'/majors/'+$scope.major._id,
       method: 'POST',
       file: file
     }).success(function(data) {
@@ -916,7 +916,6 @@ function UploadDialogCtrl($scope, $resource, $modalInstance, $upload, $modal, ap
         $modal.open({
           templateUrl: 'confirmDialog.html',
           controller: 'ConfirmDialogCtrl',
-          data: { aptid: $scope.apartment._id, mjid: $scope.major._id},
           resolve: {
             msg: function() {
               return '上传成功!';
@@ -949,6 +948,7 @@ function OutportDialogCtrl($scope, $resource, $modalInstance, $upload, $modal, a
         hidden.href = '/' + data.filename;
         hidden.target = '_blank';
         hidden.download = data.filename;
+        document.body.appendChild(hidden);
         hidden.click();
       });
   };
