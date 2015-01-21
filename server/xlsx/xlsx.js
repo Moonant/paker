@@ -5,12 +5,12 @@ var Course = require('../models/course');
 var router = express.Router();
 
 
-function parseXlsx(filename,res) {
+function parseXlsx(filename, res) {
   var result = {};
   try {
     result.status = true;
     result.obj = xlsx.parse(filename); // parses a file
-    addCoursesToDB(result,res);
+    addCoursesToDB(result, res);
   } catch (e) {
     result.status = false;
     if (result.msg)
@@ -20,7 +20,7 @@ function parseXlsx(filename,res) {
   return result;
 }
 
-function addCoursesToDB(result,res) {
+function addCoursesToDB(result, res) {
   var connStr = 'mongodb://localhost:27017/packer';
   mongoose.connect(connStr, function (err) {
     if (err) console.log('delete major' + err);
@@ -50,7 +50,7 @@ function addCoursesToDB(result,res) {
     result.msg = "文件内排版有误";
     result.status = false;
   }
-  Course.create(newCourses,function(){
+  Course.create(newCourses, function () {
     mongoose.connection.close();
     res.send(result);
   });
@@ -87,14 +87,14 @@ function getXlsxData(docs) {
   return data;
 }
 
-function buildXlsx(res) {
+function buildXlsx(aptid, res) {
   var result = {status: false};
   var fs = require('fs');
   var connStr = 'mongodb://localhost:27017/packer';
   mongoose.connect(connStr, function (err) {
     if (err) console.log('delete major' + err);
   });
-  Course.find(function (err, docs) {
+  Course.find({'apartment._id': aptid}, function (err, docs) {
     var data = getXlsxData(docs);
     var buffer = xlsx.build([{name: "课表", data: data}]); // returns a buffer
     var filename = __dirname + 'outtable.xlsx';
@@ -113,7 +113,7 @@ function buildXlsx(res) {
 //});
 
 router.get('/xlsx/build/:aptid', function (req, res) {
-  buildXlsx(res);
+  buildXlsx(aptid, res);
 });
 
 
