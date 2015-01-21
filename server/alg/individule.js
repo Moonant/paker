@@ -162,7 +162,7 @@ Individule.prototype.calFitness = function () {
   this.deCode();
   this.clearTables();
 
-  var tea = 0, clas = 0, clasDay = 0, night = 0;
+  var tea = 0, clas = 0, clasDay = 0, night = 0,same = 0;
 
   for (var i = 0; i < this.pConfig.geneNum; i++) {
     var courseId = this.pCoursesIds[i];
@@ -197,6 +197,10 @@ Individule.prototype.calFitness = function () {
         } else if (day == 1) {
           clasDay++;
         }
+
+        if(this.coursesTables[courseId][j].timeId!= t.timeId){
+          same++;
+        }
       }
 
       this.coursesTables[courseId].push(t);
@@ -209,9 +213,9 @@ Individule.prototype.calFitness = function () {
     }
   }
 
-  this.fitness = 1 / (1 + 2 * tea + 2 * clas + 0.1 * clasDay + 0.02 * night);
+  this.fitness = 1 / (1 + 2 * tea + 2 * clas + 0.1 * clasDay + 0.02 * night+0.015*same);
 
-  this.conflicts = [tea, clas, clasDay, night];
+  this.conflicts = [tea, clas, clasDay, night, same];
 
   return this.fitness;
 };
