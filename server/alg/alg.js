@@ -16,8 +16,6 @@ var auth = function (req, res, next) {
 };
 
 
-var courseArranged = [];
-
 var packerStatus = {
   isPackering: false,
   process: 0,
@@ -62,20 +60,59 @@ function startPakering() {
     if (err) console.log(err);
   });
 
-  Course.find({})
+  Course.find({'isChecked': true})
     .exec(function (err, docs) {
       if (err) throw  err;
       var courseToArrange = parseCoursesToArrange(docs);
+      Course.find({'isChecked': false})
+        .where({'classes._id': {"$in": classesIds.values}})
+        //.or([{'classes._id': {"$in": classesIds.values}}, {'teacher._id': {"$in": teacherIds.values}}])
+        .exec(function (err, docs) {
+          var courseArranged = parseCourseArranged(docs);
 
-      //var pop = runPackerAlg();
-      algProcess.send({'courseToArrange': courseToArrange, 'courseArranged': courseArranged});
-      mongoose.connection.close();
+          //var pop = runPackerAlg();
+          algProcess.send({'courseToArrange': courseToArrange, 'courseArranged': courseArranged});
+          mongoose.connection.close();
+        });
+
+
     });
 }
 
+function parseCourseArranged(docs) {
+  var coursesArranged = [];
+  for (var i in docs) {
+    var course = docs[i];
+    var c = {};
+    c.id = course._id;
+    c.weekNum = 2;
+    if (!course.teacher._id) {
+      continue;
+    }
+    c.teacherId = course.teacher._id;
+    c.classesIds = [];
+    for (var j = 0; j < course.classes.length; j++) {
+      c.classesIds.push(course.classes[j]._id);
+    }
+
+    var t = course.arrange.timeNPlace;
+    c.time = [];
+
+    for (var j = 0; j < t.length; j++) {
+      var d = {dayId: t[j].weekday._id - 1, timeId: t[j].position._id};
+      c.time.push(d);
+    }
+
+    coursesArranged.push(c);
+  }
+  return coursesArranged;
+}
+var teacherIds = new Set();
+var classesIds = new Set();
+
 function parseCoursesToArrange(docs) {
-  var teacherIds = new Set();
-  var classesIds = new Set();
+  teacherIds = new Set();
+  classesIds = new Set();
   var courseToArrange = [];
   for (var i in docs) {
     var course = docs[i];
@@ -90,11 +127,11 @@ function parseCoursesToArrange(docs) {
     c.classesIds = [];
     for (var j = 0; j < course.classes.length; j++) {
       c.classesIds.push(course.classes[j]._id);
-      //classesIds.add(course.classes[j]._id);
+      classesIds.add(course.classes[j]._id);
     }
 
     courseToArrange.push(c);
-    //teacherIds.add(c.teacherId);
+    teacherIds.add(c.teacherId);
   }
   return courseToArrange;
 }

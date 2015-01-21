@@ -2,25 +2,34 @@ var xlsx = require('node-xlsx');
 var express = require('express');
 var mongoose = require('mongoose');
 var Course = require('../models/course');
+var Apartment = require('../models/apartment');
 var router = express.Router();
 
 
-function parseXlsx(filename, res) {
-  var result = {};
-  try {
-    result.status = true;
-    result.obj = xlsx.parse(filename); // parses a file
-    addCoursesToDB(result, res);
-  } catch (e) {
-    result.status = false;
-    if (result.msg)
-      result.msg = "文件格式应该为.xlsx";
-    res.send(result);
-  }
-  return result;
+function parseXlsx(filename, req, res) {
+  var aptid = req.params.aptid;
+  var mjid = req.params.mjid;
+  var connStr = 'mongodb://localhost:27017/packer';
+  mongoose.connect(connStr, function (err) {
+    if (err) console.log('delete major' + err);
+  });
+  Apartment.findOne({'_id': aptid}, function (err, doc) {
+    var result = {};
+    try {
+      result.status = true;
+      result.obj = xlsx.parse(filename); // parses a file
+      addCoursesToDB(result, res, doc, mjid);
+    } catch (e) {
+      mongoose.connection.close();
+      result.status = false;
+      if (result.msg)
+        result.msg = "文件格式应该为.xlsx";
+      res.send(result);
+    }
+  });
 }
 
-function addCoursesToDB(result, res) {
+function addCoursesToDB(result, res, doc, mjid) {
   var connStr = 'mongodb://localhost:27017/packer';
   mongoose.connect(connStr, function (err) {
     if (err) console.log('delete major' + err);
@@ -42,7 +51,10 @@ function addCoursesToDB(result, res) {
       newCourse.labHours = c[6];
       newCourse.extracurricular = c[7];
       newCourse.totalHours = c[3];
-      //newCourse.save();
+
+      newCourse.apartment = {_id: doc._id, name: doc.name};
+      newCourse.major = {_id: doc.majors[mjid]._id, name: doc.majors[mjid].name};
+
       newCourses.push(newCourse);
     }
   } catch (e) {
@@ -54,7 +66,6 @@ function addCoursesToDB(result, res) {
     mongoose.connection.close();
     res.send(result);
   });
-
 }
 
 function getXlsxData(docs) {

@@ -120,7 +120,7 @@ router.put('/courses/:crsid/checkconflict', function (req, res) {
     Course.find()
       .where({'arrange.timeNPlace.position._id': position})
       .where({'arrange.timeNPlace.weekday._id': weekDay})
-      .or([{'classes.id': {"$in": classIds}}, {'teacher._id': teacherId}])
+      .or([{'classes._id': {"$in": classIds}}, {'teacher._id': teacherId}])
       .exec(function (err, docs) {
         if (docs.length > 0&&docs[0]._id != course._id) {
           result.isConfict = true;
