@@ -951,6 +951,7 @@ function OutportDialogCtrl($scope, $resource, $modalInstance, $upload, $modal, a
         document.body.appendChild(hidden);
         hidden.click();
       });
+    $modalInstance.close();
   };
   $scope.cancel = function() {
     $modalInstance.dismiss('cancel');
