@@ -16,7 +16,7 @@ var auth = function(req, res, next){
 };
 
 // add a course
-router.post('/upload/apartments/:aptid/major/:mjid', multipartyMiddleware, function(req, res) {
+router.post('/upload/apartments/:aptid/majors/:mjid', multipartyMiddleware, function(req, res) {
 
   var file = req.files.file;
   xlsx.parseXlsx(file.path,req,res);

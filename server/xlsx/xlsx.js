@@ -9,7 +9,7 @@ var router = express.Router();
 function parseXlsx(filename, req, res) {
   var aptid = req.params.aptid;
   var mjid = req.params.mjid;
-
+  var connStr = 'mongodb://localhost:27017/packer';
   mongoose.connect(connStr, function (err) {
     if (err) console.log('delete major' + err);
   });
