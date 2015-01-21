@@ -51,7 +51,7 @@ function addCoursesToDB(result, res, doc, mjid) {
       newCourse.labHours = c[6];
       newCourse.extracurricular = c[7];
       newCourse.totalHours = c[3];
-
+      newCourse.isChecked = false;
       newCourse.apartment = {_id: doc._id, name: doc.name};
       newCourse.major = {_id: doc.majors[mjid]._id, name: doc.majors[mjid].name};
 

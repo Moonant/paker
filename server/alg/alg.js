@@ -65,8 +65,9 @@ function startPakering() {
       if (err) throw  err;
       var courseToArrange = parseCoursesToArrange(docs);
       Course.find({'isChecked': false})
-        .where({'classes._id': {"$in": classesIds.values}})
-        //.or([{'classes._id': {"$in": classesIds.values}}, {'teacher._id': {"$in": teacherIds.values}}])
+        //.where({'classes._id': {"$in": classesIds.values}})
+        //.where({'teacher._id': {"$in": teacherIds.values}})
+        .or([{'classes._id': {"$in": classesIds.values}}, {'teacher._id': {"$in": teacherIds.values}}])
         .exec(function (err, docs) {
           var courseArranged = parseCourseArranged(docs);
 
