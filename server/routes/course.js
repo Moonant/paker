@@ -88,8 +88,8 @@ router.put('/courses/:crsid', auth, function (req, res) {
 
 router.put('/courses/:crsid/checkconflict', function (req, res) {
   var crsid = req.params.crsid;
-  var preIndex = req.body.preIndex;
-  var weekDay = req.body.weekDay;
+  var preIndex = req.body.preindex;
+  var weekDay = req.body.weekday;
   var position = req.body.position;
   var result = {
     status: false,
@@ -117,34 +117,42 @@ router.put('/courses/:crsid/checkconflict', function (req, res) {
       classIds.push(course.classes[i]._id);
     }
 
-    Course.find({'arrange.timeNPlace.weekday._id': weekDay, 'arrange.timeNPlace.position._id': position})
+    Course.find()
+      .where({'arrange.timeNPlace.position._id': position})
+      .where({'arrange.timeNPlace.weekday._id': weekDay})
       .or([{'classes.id': {"$in": classIds}}, {'teacher._id': teacherId}])
       .exec(function (err, docs) {
-        if (docs) {
+        if (docs.length > 0&&docs[0]._id != course._id) {
           result.isConfict = true;
           result.msg = "有冲突,无法更改";
           result.courses = docs;
+          mongoose.connection.close();
           res.send(result);
         } else {
           result.isConfict = false;
           result.msg = "无冲突,更改完成";
-          course.arrange.timeNPlace[preIndex] = parseWeekPosition(weekDay, position,course.arrange.timeNPlace[preIndex].classrome);
+          var newt = parseWeekPosition(weekDay, position, course.arrange.timeNPlace[preIndex].classrome);
+          course.arrange.timeNPlace[preIndex].weekday._id = newt.weekday._id;
+          course.arrange.timeNPlace[preIndex].weekday.name = newt.weekday.name;
+          course.arrange.timeNPlace[preIndex].position._id = newt.position._id;
+          course.arrange.timeNPlace[preIndex].position.name = newt.position.name;
 
           var t = course.arrange.timeNPlace;
           course.arrange.timeNPlaceName = "";
-          for (i in t) {
+          for (var i = 0; i < t.length; i++) {
             course.arrange.timeNPlaceName = course.arrange.timeNPlaceName + t[i].weekday.name + t[i].position.name + "   ";
           }
 
-          course.save();
-          result.send(result);
+          course.save(function () {
+            mongoose.connection.close();
+            res.send(result);
+          });
         }
-        mongoose.connection.close();
       });
   });
 });
 
-function parseWeekPosition(weekdayId, positionId,classrome) {
+function parseWeekPosition(weekdayId, positionId, classrome) {
   var weeks = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
   var positions = ["第1,2节", "第3,4节", "第5,6节", "第7,8节", "第9,10节", "第11,12节"];
   var t = {};
