@@ -9,7 +9,7 @@ function parseXlsx(filename) {
   var result = {};
   try {
     result.status = true;
-    result.obj = xlsx.parse(__dirname + '/plan.xlsx'); // parses a file
+    result.obj = xlsx.parse(filename); // parses a file
     addCoursesToDB(result);
   } catch (e) {
     result.status = false;
@@ -119,5 +119,6 @@ router.get('/xlsx/build/', function (req, res) {
 //var data = [[1,2,3],[true, false, null, 'sheetjs'],['foo','bar',new Date('2014-02-19T14:30Z'), '0.3'], ['baz', null, 'qux']];
 //var buffer = xlsx.build([{name: "mySheetName", data: data}]); // returns a buffer
 
+router.parseXlsx = parseXlsx;
 
 module.exports = router;

@@ -3,6 +3,7 @@ var passport = require('../passport');
 var mongoose = require('mongoose');
 var Course = require('../models/course');
 var multiparty = require('connect-multiparty');
+var xlsx = require('../xlsx/xlsx');
 var multipartyMiddleware = multiparty();
 var router = express.Router();
 
@@ -17,6 +18,9 @@ var auth = function(req, res, next){
 // add a course
 router.post('/upload', multipartyMiddleware, function(req, res) {
   var file = req.files.file;
+  var r = xlsx.parseXlsx(file.path);
+  console.dir(r);
+  res.send(r);
 });
 
 module.exports = router;
