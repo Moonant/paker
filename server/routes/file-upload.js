@@ -18,9 +18,7 @@ var auth = function(req, res, next){
 // add a course
 router.post('/upload', multipartyMiddleware, function(req, res) {
   var file = req.files.file;
-  var r = xlsx.parseXlsx(file.path);
-  console.dir(r);
-  res.send(r);
+  xlsx.parseXlsx(file.path,res);
 });
 
 module.exports = router;

@@ -128,7 +128,14 @@ router.put('/courses/:crsid/checkconflict', function (req, res) {
         } else {
           result.isConfict = false;
           result.msg = "无冲突,更改完成";
-          course.arrange.timeNPlace[preIndex] = parseWeekPosition(weekDay, position);
+          course.arrange.timeNPlace[preIndex] = parseWeekPosition(weekDay, position,course.arrange.timeNPlace[preIndex].classrome);
+
+          var t = course.arrange.timeNPlace;
+          course.arrange.timeNPlaceName = "";
+          for (i in t) {
+            course.arrange.timeNPlaceName = course.arrange.timeNPlaceName + t[i].weekday.name + t[i].position.name + "   ";
+          }
+
           course.save();
           result.send(result);
         }
@@ -137,7 +144,7 @@ router.put('/courses/:crsid/checkconflict', function (req, res) {
   });
 });
 
-function parseWeekPosition(weekdayId, positionId) {
+function parseWeekPosition(weekdayId, positionId,classrome) {
   var weeks = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
   var positions = ["第1,2节", "第3,4节", "第5,6节", "第7,8节", "第9,10节", "第11,12节"];
   var t = {};
@@ -147,6 +154,7 @@ function parseWeekPosition(weekdayId, positionId) {
   t.position = {};
   t.position._id = positionId;
   t.position.name = positions[positionId];
+  t.classrome = classrome;
   return t;
 }
 
