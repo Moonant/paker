@@ -10,6 +10,7 @@ var user = require('./routes/user.js');
 var course = require('./routes/course.js');
 var apartment = require('./routes/apartment.js');
 var teacher = require('./routes/teacher.js');
+var fileUpload = require('./routes/file-upload.js');
 var grade = require('./routes/grade.js');
 var alg = require('./alg/alg.js');
 var xlsx = require('./xlsx/xlsx.js');
@@ -70,6 +71,7 @@ app.use(teacher);
 app.use(grade);
 app.use(alg);
 app.use(xlsx);
+app.use(fileUpload);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

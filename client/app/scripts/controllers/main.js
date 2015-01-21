@@ -8,7 +8,7 @@
  * Controller of the clientApp
  */
 
-function MainCtrl($q, $resource, $scope, $location, 
+function MainCtrl($q, $resource, $scope, $location, $rootScope,
   $modal, Auth, Apartment, Major, Cls, Teacher, Course){
 
   $scope.user = new Auth();  
@@ -16,6 +16,7 @@ function MainCtrl($q, $resource, $scope, $location,
   $scope.allCourses = true;
   $scope.classCourses = false;
   $scope.teacherCourses = false;
+
 
   $scope.showAllCourses = function() {
     $scope.allCourses = true;
@@ -26,27 +27,33 @@ function MainCtrl($q, $resource, $scope, $location,
     $scope.shownCourses = [
       { 
         name: '1-2',
+        _id: 0,
         // contain a row courses
         courses: [ [], [], [], [], [] ]
       },
       {
         name: '3-4',
+        _id: 1,
         courses: [ [], [], [], [], [] ]
       },
       {
         name: '5-6',
+        _id: 2,
         courses: [ [], [], [], [], [] ]
       },
       {
         name: '7-8',
+        _id: 3,
         courses: [ [], [], [], [], [] ]
       },
       {
         name: '9-10',
+        _id: 4,
         courses: [ [], [], [], [], [] ]
       },
       {
         name: '11-12',
+        _id: 5,
         courses: [ [], [], [], [], [] ]
       }
     ];
@@ -72,41 +79,91 @@ function MainCtrl($q, $resource, $scope, $location,
     var courses = $scope.courses.filter(filt);
     //console.dir(courses);
     courses.forEach(function(course) {
-      course.arrange.timeNPlace.forEach(function(timeNPlace) {
+      for(var i=0; i<course.arrange.timeNPlace.length; i++) {
+        var timeNPlace = course.arrange.timeNPlace[i];
         var c = {};
         c._id = course._id;
+        c._tid = course.teacher._id;
         c.title = course.name;
+        c.arrange = course.arrange;
         c.drag = true;
+        c.preindex = i;
         $scope
           .shownCourses[timeNPlace.position._id]
           .courses[timeNPlace.weekday._id - 1]
           .push(c);
-      });
+      }
     });
   };
 
-  // drag stopped, check for conflict
-  $scope.stop = function(event) {
-    // grab the course
-    console.dir($(event.currentTarget));
-    var item = $(event.target).scope();
-    var course = $scope.courses.filter(function(course) {
-      return course._id === item.course._id;
-    })[0];
-  };
-
-  $scope.checkConflict = function(){
-    console.log('fuck');
+  // check for conflict called every drop
+  $scope.checkConflict = function(event, ui, rowIndex, columnIndex){
+    var course = angular.element(ui.draggable).scope().course;
+    var CheckConflict = $resource('courses/:crsid/checkconflict', 
+      { crsid: '' },
+      { update: {method: 'PUT'} });
+    var updatedCourse = new CheckConflict();
+    updatedCourse.weekday = columnIndex + 1;
+    updatedCourse.position = rowIndex;
+    updatedCourse.preindex = course.preindex;
+    console.dir(updatedCourse);
+    updatedCourse.$update({ crsid: course._id }, function() {
+    });
+    /*
+    var checkTeacherConflict = function(row, column) {
+      var teacherId = $scope.shownCourses[row].courses[column][0]._tid;
+      var courses = $scope.courses.filter(function(course) {
+        return course.teacher._id === teacherId;
+      });
+      var flag = false;
+      courses.forEach(function(course) {
+        course.arrange.timeNPlace.forEach(function(t) {
+          var b = t.weekday._id === columnIndex + 1;
+          b = b && t.position._id === rowIndex;
+          if(b) { flag = true; }
+        });
+      });
+      // teacher's schedule conflict
+      if(flag) {
+        $modal.open({
+          templateUrl: 'confirmDialog.html',
+          controller: 'ConfirmDialogCtrl',
+          resolve: {
+            msg: function() {
+              return '教师' + courses[0].teacher.name  + '上课时间发生冲突';
+            }
+          },
+          size: 'sm'
+        });
+      }
+    };
     $scope.shownCourses.forEach(function(row) {
       row.courses.forEach(function(courses) {
         if(courses.length >= 2) {
-          console.log('conflict');
+          // conflict
+          $modal.open({
+            templateUrl: 'confirmDialog.html',
+            controller: 'ConfirmDialogCtrl',
+              resolve: {
+              msg: function() {
+                return '班级上课时间发生冲突';
+              }
+            },
+            size: 'sm'
+          });
         }
       });
     });
-  };
-
-  $scope.saveClassCourses = function() {
+    var isChanged = true;
+    course.arrange.timeNPlace.forEach(function(timeNPlace) {
+      var b = timeNPlace.weekday._id === columnIndex + 1;
+      b = b && timeNPlace.position._id === rowIndex;
+      if(b) { isChanged = false; }
+    });
+    if(isChanged) {
+      checkTeacherConflict(rowIndex, columnIndex);
+    }
+    */
   };
 
   // apply for apartments' data
@@ -396,8 +453,8 @@ function MainCtrl($q, $resource, $scope, $location,
     });
   };
 }
-MainCtrl.$inject = ['$q', '$resource', '$scope', '$location', '$modal',
-  'Auth', 'Apartment', 'Major', 'Cls', 'Teacher', 'Course'];
+MainCtrl.$inject = ['$q', '$resource', '$scope', '$location', '$rootScope', 
+  '$modal', 'Auth', 'Apartment', 'Major', 'Cls', 'Teacher', 'Course'];
 
 // EditCoureseDialogCtrl
 function EditCourseDialogCtrl($scope, $modalInstance, Course, course, grades, apartments, teachers) {
@@ -580,12 +637,27 @@ function ConfirmDialogCtrl($scope, $modalInstance, msg) {
 ConfirmDialogCtrl.$inject = ['$scope', '$modalInstance', 'msg'];
 
 // Controller for UploadDialog
-function UploadDialogCtrl($scope, $modalInstance) {
+function UploadDialogCtrl($scope, $modalInstance, $upload) {
+  $scope.excelFile = null;
+  $scope.upload = function(){
+    console.dir($scope.excelFile);
+    var file = $scope.excelFile[0];
+    $scope.upload = $upload.upload({
+      url: 'upload',
+      method: 'POST',
+      file: file
+    }).progress(function(evt) {
+      console.log('progress: ' + parseInt(100.0 * evt.loaded / evt.total) + '% file: ' + evt.config.file.name);
+    }).success(function() {
+      console.log('success!');
+    });
+  };
+  // *****
   $scope.cancel = function() {
     $modalInstance.dismiss('cancel');
   };
 }
-UploadDialogCtrl.$inject = ['$scope', '$modalInstance'];
+UploadDialogCtrl.$inject = ['$scope', '$modalInstance', '$upload'];
 
 // Controller for add course dialog
 function AddCourseDialogCtrl($scope, $modalInstance, Apartment, 
@@ -832,7 +904,7 @@ function AddTeacherDialogCtrl($scope, $modalInstance, apartments) {
 AddTeacherDialogCtrl.$inject = ['$scope', '$modalInstance', 'apartments'];
 
 var dependences = ['authenticationServices', 'apartmentServices',
-  'teacherServices', 'courseServices', 'ngDragDrop'];
+  'teacherServices', 'courseServices', 'ngDragDrop', 'angularFileUpload'];
 angular.module('mainControllers', dependences)
   .controller('MainCtrl', MainCtrl)
   .controller('ConfirmDialogCtrl', ConfirmDialogCtrl)

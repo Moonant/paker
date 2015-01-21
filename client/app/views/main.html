@@ -125,15 +125,14 @@
           <tr class="row" ng-repeat="courseRow in shownCourses">
             <td class="col-sm-2 course-row"><div class="course-row-name btn">{{ courseRow.name }}</div></td>
             <td class="col-sm-2 row" data-drop="true" ng-repeat="unitCourses in courseRow.courses" ng-model="unitCourses"
-              data-jqyoui-options="{accept:'.btn-draggable:not([ng-model=course])'}" jqyoui-droppable="{ multiple: true }">
+              data-jqyoui-options="{accept:'.btn-draggable:not([ng-model=course])'}" jqyoui-droppable="{ onDrop: 'checkConflict(courseRow._id, $index)', multiple: true }">
               <div class="col-sm-12 btn btn-draggable btn-info" ng-repeat="course in unitCourses" ng-show="course.title" data-drag="{{course.drag}}" 
-                data-jqyoui-options="{ revert: 'invalid' }" ng-model="unitCourses" jqyoui-draggable="{ onStop: 'stop(item, $index)', index: {{ $index }}}">
+                data-jqyoui-options="{ revert: 'invalid' }" ng-model="unitCourses" jqyoui-draggable="{ index: {{ $index }}}">
                 {{course.title}}
               </div>
             </td>
           </tr>
         </table>
-        <center><a href="" class="btn btn-primary right">保存</a></center>
       </div><!-- show courses of a class -->
       <div ng-show="teacherCourses">
       </div>

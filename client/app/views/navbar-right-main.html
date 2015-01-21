@@ -35,7 +35,7 @@
     <form>
       <div class="form-group">
         <label for="excelFileInput">文件导入</label>
-        <input type="file" id="excelFileInput">
+        <input type="file" ng-file-select accept="application/vnd.ms-excel" ng-model="excelFile">
         <p class="help-block">请上传符合要求的excel文件</p>
       </div><!-- form-group -->
     </form>
@@ -44,7 +44,7 @@
   <!-- Dialog footer -->
   <div class="modal-footer">
     <button type="button" class="btn btn-default" ng-click="cancel()">取消</button>
-    <button type="button" class="btn btn-primary">导入</button>
+    <button type="button" ng-click="upload()" class="btn btn-primary">导入</button>
   </div>
 </script>
 
