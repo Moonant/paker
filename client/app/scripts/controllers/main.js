@@ -280,6 +280,9 @@ function MainCtrl($q, $resource, $scope, $location, $rootScope,
           }
         });
       }
+      else {
+        $scope.getCourses();
+      }
     });
     /*
     var checkTeacherConflict = function(row, column) {
@@ -926,19 +929,31 @@ function UploadDialogCtrl($scope, $modalInstance, $upload, $modal, apartments) {
     $modalInstance.dismiss('cancel');
   };
 }
-UploadDialogCtrl.$inject = ['$scope', '$modalInstance', '$upload', '$modal', 'apartments'];
+UploadDialogCtrl.$inject = ['$scope', '$resource', '$modalInstance', '$upload', '$modal', 'apartments'];
 
 // Controller for outport 
-function OutportDialogCtrl($scope, $modalInstance, $upload, $modal, apartments) {
+function OutportDialogCtrl($scope, $resource, $modalInstance, $upload, $modal, apartments) {
   $scope.apartments = apartments;
   $scope.apartment = null;
   $scope.major = null;
   // *****
+  $scope.download = function() {
+    var Build = $resource('xlsx/build/:aptid');
+    Build.get({ aptid: $scope.apartment._id },
+      function(data) {
+        console.log(data.filename);
+        var hidden = document.createElement('a');
+        hidden.href = '/' + data.filename;
+        hidden.target = '_blank';
+        hidden.download = data.filename;
+        hidden.click();
+      });
+  };
   $scope.cancel = function() {
     $modalInstance.dismiss('cancel');
   };
 }
-OutportDialogCtrl.$inject = ['$scope', '$modalInstance', '$upload', '$modal', 'apartments'];
+OutportDialogCtrl.$inject = ['$scope', '$resource', '$modalInstance', '$upload', '$modal', 'apartments'];
 
 // Controller for add course dialog
 function AddCourseDialogCtrl($scope, $modalInstance, Apartment, 
