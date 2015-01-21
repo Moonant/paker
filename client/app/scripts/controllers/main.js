@@ -17,6 +17,79 @@ function MainCtrl($q, $resource, $scope, $location, $rootScope,
   $scope.classCourses = false;
   $scope.teacherCourses = false;
 
+  // add classroom
+  $scope.addClassroom = function(crsid) {
+    var course = $scope.courses.filter(function(course) {
+      return course._id === crsid;
+    })[0];
+    $modal.open({
+      templateUrl: 'addClassroomDialog.html',
+      controller: function($scope, $modalInstance) {
+        $scope.course = course;
+        $scope.ok = function() {
+          var invalid = true;
+          $scope.course.arrange.timeNPlace.forEach(function(timeNPlace) {
+            if(timeNPlace.classroom !== '' && timeNPlace.classroom !== undefined) {
+              invalid = false; 
+            }
+          });
+          if(invalid) { return; }
+          $scope.course.arrange.timeNPlaceName = '';
+          $scope.course.arrange.timeNPlace.forEach(function(timeNPlace) {
+            $scope.course.arrange.timeNPlaceName += timeNPlace.weekday.name;
+            $scope.course.arrange.timeNPlaceName += timeNPlace.position.name;
+            $scope.course.arrange.timeNPlaceName += timeNPlace.classroom + ' ';
+          });
+          var course = new Course();
+          for(var attrname in $scope.course) {
+            course[attrname] = $scope.course[attrname];
+          }
+          course.$update({ crsid: $scope.course._id }, function() {
+            $modalInstance.close();
+          });
+        };
+        $scope.cancel = function() {
+          $modalInstance.dismiss();
+        };
+      },
+      size: 'sm'
+    });
+  };
+
+  // start to manage 
+  $scope.packer = function() {
+    var Packer = $resource('/alg/packer');
+    Packer.get(function(data) {
+      if(data.isPackering !== true) { return; }
+      console.dir(data);
+      var modalInstance = $modal.open({
+        templateUrl: 'processDialog.html',
+        controller: function($scope, $modalInstance) {
+          $scope.ok =  function() {
+            $modalInstance.close();
+          };
+          $scope.title = '自动排课中';
+          $scope.tip = '处理进度';
+          $scope.isButtonDisabled = true;
+          var interval = setInterval(function() {
+          var Status = $resource('/alg/packer/status');
+          Status.get(function(data) {
+            if(data.process === 1) {
+              $scope.tip='排课完成'; 
+              $scope.isButtonDisabled = false;
+              clearInterval(interval); 
+            }
+            $scope.processValue = data.process*100;
+          });
+          }, 30);
+        },
+        size: ''
+      });
+      modalInstance.result.then(function() {
+        $scope.getCourses();
+      });
+    });
+  };
 
   $scope.showAllCourses = function() {
     $scope.allCourses = true;
@@ -69,6 +142,9 @@ function MainCtrl($q, $resource, $scope, $location, $rootScope,
 
     // filt all the courses of specified class
     var filt = function(course) {
+      if(!course.apartment ) {
+        return;
+      }
       if(course.apartment._id !== aptid) { return false; }
       if(course.major._id !== mjid) { return false; }
       var cls = course.classes.filter(function(cls) {
@@ -77,7 +153,7 @@ function MainCtrl($q, $resource, $scope, $location, $rootScope,
       return cls[0] !== undefined;
     };
     var courses = $scope.courses.filter(filt);
-    //console.dir(courses);
+    console.dir(courses);
     courses.forEach(function(course) {
       for(var i=0; i<course.arrange.timeNPlace.length; i++) {
         var timeNPlace = course.arrange.timeNPlace[i];
@@ -507,20 +583,26 @@ function EditCourseDialogCtrl($scope, $modalInstance, Course, course, grades, ap
   $scope.teachers = teachers;
   $scope.course = course;
   apartments.forEach(function(apt) {
+    if(course.apartment === undefined) { return; }
     if(apt._id === course.apartment._id) { $scope.course.apartment = apt; }
   });
-  $scope.course.apartment.majors.forEach(function(mj) {
-    if(mj._id === $scope.course.major._id) { $scope.course.major = mj; }
-  });
-  var classes = [];
-  $scope.course.major.classes.forEach(function(cls) {
-    $scope.course.classes.forEach(function(selectedCls) {
-      if(selectedCls._id === cls._id) { cls.isSelected = true; }
+  if($scope.course.apartment !== undefined) {
+    $scope.course.apartment.majors.forEach(function(mj) {
+      if(mj._id === $scope.course.major._id) { $scope.course.major = mj; }
     });
-    classes.push(cls);
-  });
+  }
+  var classes = [];
+  if($scope.course.major !== undefined) {
+    $scope.course.major.classes.forEach(function(cls) {
+      $scope.course.classes.forEach(function(selectedCls) {
+        if(selectedCls._id === cls._id) { cls.isSelected = true; }
+      });
+      classes.push(cls);
+    });
+  }
   $scope.classes = classes;
   grades.forEach(function(grade) {
+    if($scope.course.grade === undefined) { return; }
     if(grade._id === $scope.course.grade._id) { $scope.course.grade = grade; }
   });
 
@@ -532,6 +614,7 @@ function EditCourseDialogCtrl($scope, $modalInstance, Course, course, grades, ap
       if(cls.grade === undefined) { return false; }
       return cls.grade._id === $scope.course.grade._id;
     };
+    if($scope.course.major === undefined) { return; }
     if($scope.course.major.classes) {
       $scope.course.classes = $scope.course.major.classes.filter(filt);
       $scope.tipHide = true;
@@ -611,6 +694,7 @@ function EditCourseDialogCtrl($scope, $modalInstance, Course, course, grades, ap
     var filt = function(item) {
       return item._id === parseInt($scope.course.teacher._id);
     };
+    if($scope.course.teacher === undefined) { $scope.course.teacher = {}; }
     var teacher = $scope.teachers.filter(filt);
     if(teacher[0]) {
       $scope.course.teacher = teacher[0];
@@ -714,7 +798,7 @@ UploadDialogCtrl.$inject = ['$scope', '$modalInstance', '$upload', '$modal'];
 
 // Controller for add course dialog
 function AddCourseDialogCtrl($scope, $modalInstance, Apartment, 
-  apartments, teachers, grades, Course) {
+  apartments, teachers, grades, Course, $modal) {
 
   $scope.course = new Course();
   // data required, should resolve in enclosing scope
@@ -840,6 +924,26 @@ function AddCourseDialogCtrl($scope, $modalInstance, Apartment,
   };
 
   $scope.addCourse = function() {
+    var invalid = $scope.course.name === '';
+    invalid = invalid || $scope.course.grade._id === undefined;
+    invalid = invalid || $scope.course.type.isCompulsory === undefined;
+    invalid = invalid || $scope.course.intermHours === '';
+    invalid = invalid || $scope.course.teacher._id === '';
+    invalid = invalid || $scope.course.teacher.name ==='';
+    invalid = invalid || $scope.course.classes === undefined;
+    if(invalid) { 
+      $modal.open({
+        templateUrl: 'confirmDialog.html',
+        controller: 'ConfirmDialogCtrl',
+        resolve: {
+          msg: function() {
+            return '必填项为空';
+          }
+        },
+        size: 'sm'
+      });
+      return;
+    }
     $scope.course.arrange.weeksName = '';
     $scope.course.arrange.weekSecs.forEach(function(weekSec) {
       $scope.course.arrange.weeksName += weekSec.name + ' ';
@@ -864,7 +968,7 @@ function AddCourseDialogCtrl($scope, $modalInstance, Apartment,
   };
 }
 AddCourseDialogCtrl.$inject = ['$scope', '$modalInstance', 'Apartment',
-  'apartments', 'teachers', 'grades', 'Course'];
+  'apartments', 'teachers', 'grades', 'Course', '$modal'];
 
 // Controller for add apartment dialog
 function AddApartmentDialogCtrl($scope, $modalInstance) {
