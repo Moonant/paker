@@ -843,6 +843,7 @@ function EditCourseDialogCtrl($scope, $modalInstance, Course, course, grades, ap
   };
 
   $scope.addCourse = function() {
+    $scope.course.arrange.weeksName = '';
     $scope.course.arrange.weekSecs.forEach(function(weekSec) {
       $scope.course.arrange.weeksName += weekSec.name + ' ';
     });
@@ -951,6 +952,7 @@ function OutportDialogCtrl($scope, $resource, $modalInstance, $upload, $modal, a
         document.body.appendChild(hidden);
         hidden.click();
       });
+    $modalInstance.close();
   };
   $scope.cancel = function() {
     $modalInstance.dismiss('cancel');
