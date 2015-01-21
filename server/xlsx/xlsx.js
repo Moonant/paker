@@ -5,32 +5,33 @@ var Course = require('../models/course');
 var router = express.Router();
 
 
-function parseXlsx(filename) {
+function parseXlsx(filename,res) {
   var result = {};
   try {
     result.status = true;
     result.obj = xlsx.parse(filename); // parses a file
-    addCoursesToDB(result);
+    addCoursesToDB(result,res);
   } catch (e) {
     result.status = false;
     if (result.msg)
       result.msg = "文件格式应该为.xlsx";
+    res.send(result);
   }
   return result;
 }
 
-function addCoursesToDB(result) {
+function addCoursesToDB(result,res) {
   var connStr = 'mongodb://localhost:27017/packer';
   mongoose.connect(connStr, function (err) {
     if (err) console.log('delete major' + err);
   });
   var obj = result.obj[0];
+  var newCourses = [];
   try {
     for (var i = 3; i < obj.data.length - 2; i++) {
       var c = obj.data[i];
       var newCourse = new Course();
       newCourse.name = c[0];
-      newCourse.classesName = c[0];
       newCourse.type = {};
       newCourse.type.isCompulsory = (c[1] == "必修");
       newCourse.type.name = c[1];
@@ -41,15 +42,19 @@ function addCoursesToDB(result) {
       newCourse.labHours = c[6];
       newCourse.extracurricular = c[7];
       newCourse.totalHours = c[3];
-      newCourse.save();
+      //newCourse.save();
+      newCourses.push(newCourse);
     }
   } catch (e) {
     console.log(e);
     result.msg = "文件内排版有误";
     result.status = false;
   }
+  Course.create(newCourses,function(){
+    mongoose.connection.close();
+    res.send(result);
+  });
 
-  mongoose.connection.close();
 }
 
 function getXlsxData(docs) {
@@ -103,9 +108,9 @@ function buildXlsx(res) {
 
 
 // Test
-router.get('/xlsx/parse', function (req, res) {
-  res.send(parseXlsx());
-});
+//router.get('/xlsx/parse', function (req, res) {
+//  res.send(parseXlsx());
+//});
 
 router.get('/xlsx/build/', function (req, res) {
   buildXlsx(res);
