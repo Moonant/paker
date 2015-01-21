@@ -625,7 +625,10 @@ function MainCtrl($q, $resource, $scope, $location, $rootScope,
       templateUrl: 'uploadDialog.html',
       controller: 'UploadDialogCtrl',
       resolve: {
-        apartments: $scope.getApartmentsValue
+        apartments: function() {
+          console.dir($scope.getApartmentsValue());
+          return $scope.getApartmentsValue();
+        }
       },
       size: 'lg'
     });
@@ -893,7 +896,7 @@ function ConfirmDialogCtrl($scope, $modalInstance, msg) {
 ConfirmDialogCtrl.$inject = ['$scope', '$modalInstance', 'msg'];
 
 // Controller for UploadDialog
-function UploadDialogCtrl($scope, $modalInstance, $upload, $modal, apartments) {
+function UploadDialogCtrl($scope, $resource, $modalInstance, $upload, $modal, apartments) {
   $scope.apartments = apartments;
   $scope.apartment = null;
   $scope.major = null;
