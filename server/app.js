@@ -32,7 +32,8 @@ app.use(session({
 app.use(passport.initialize()); // Add passport initialization
 app.use(passport.session()); // Add passport initialization
 
-// error handlers
+// download 
+app.use(express.static(path.join(__dirname, '/xlsx')));
 
 // development error handler
 // will print stacktrace

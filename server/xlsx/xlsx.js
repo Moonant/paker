@@ -92,13 +92,14 @@ function buildXlsx(aptid, res) {
   var fs = require('fs');
   var connStr = 'mongodb://localhost:27017/packer';
   mongoose.connect(connStr, function (err) {
-    if (err) console.log('delete major' + err);
+    if (err) console.log('build ' + err);
   });
   Course.find({'apartment._id': aptid}, function (err, docs) {
     var data = getXlsxData(docs);
     var buffer = xlsx.build([{name: "课表", data: data}]); // returns a buffer
-    var filename = __dirname + 'outtable.xlsx';
-    fs.writeFileSync(filename, buffer, 'binary');
+    var date = new Date();
+    var filename = date.toISOString() + '.xlsx' ;
+    fs.writeFileSync(__dirname + '/' + filename, buffer, 'binary');
     result.filename = filename;
     result.status = true;
     res.send(result);
@@ -113,6 +114,7 @@ function buildXlsx(aptid, res) {
 //});
 
 router.get('/xlsx/build/:aptid', function (req, res) {
+  var aptid = req.params.aptid;
   buildXlsx(aptid, res);
 });
 
