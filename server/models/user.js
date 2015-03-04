@@ -1,5 +1,4 @@
 var mongoose = require('mongoose');
-var crypto = require('crypto');
 var bcrypt = require('bcrypt');
 var Schema = mongoose.Schema;
 var SALT_WORK_FACTOR = 11;
@@ -11,8 +10,6 @@ var userSchema = new Schema({
 
 userSchema.pre('save', function(next) {
   var user = this;
-  var iterations = 1111;
-  var keylen = 24;
   
   // only hash the password if it has been modified
   if(!user.isModified('password')) return next();
@@ -37,7 +34,5 @@ userSchema.methods.validPassword = function(candidatePassword, done) {
     done(null, isMatch);
   });
 };
-
-var User = mongoose.model('User', userSchema);
 
 module.exports = mongoose.model('User', userSchema);

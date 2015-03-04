@@ -2,7 +2,6 @@
 
 // Service provide authencication resource class
 
-var authencicationServices = angular.module('authenticationServices', []);
 
 function AuthenticationInterceptor($q, $location){
   var responseInterceptor = {
@@ -16,8 +15,6 @@ function AuthenticationInterceptor($q, $location){
 
   return responseInterceptor;
 }
-authencicationServices.factory('authenticationInterceptor', 
-  AuthenticationInterceptor);
 AuthenticationInterceptor.$inject = ['$q', '$location'];
 
 function Auth($resource, authenticationInterceptor){
@@ -25,14 +22,18 @@ function Auth($resource, authenticationInterceptor){
     login: {method: 'POST', params: {verb: 'login'}},
     logout: {method: 'POST', params: {verb: 'logout'}},
     register: {method: 'POST', params: {verb: 'register'}, isArray: false},
+    isExist: {method: 'POST', params: {verb: 'existence'}},
     check: {
       method: 'GET',
-      params: {verb: ''},
-      interceptor: authenticationInterceptor,
-      isArray: true
+      params: {verb: 'loggedin'},
+      interceptor: authenticationInterceptor
     }
   };
-  return $resource('/user/:verb', {verb: 'login'}, options);
+  return $resource('/users/:verb', {verb: 'login'}, options);
 }
-authencicationServices.factory('Auth', Auth);
 Auth.$inject = ['$resource','authenticationInterceptor'];
+
+// Add to module
+angular.module('authenticationServices', [])
+  .factory('authenticationInterceptor', AuthenticationInterceptor)
+  .factory('Auth', Auth);
