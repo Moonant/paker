@@ -21,7 +21,7 @@ Packer
 * First of all
   ```
   $ sudo npm install -g grunt-cli
-  $ #sudo npm install -g express-generator
+  $ # sudo npm install -g express-generator
   $ sudo npm install -g bower
   $ sudo npm install -g nodemon
   $ sudo apt-get install ruby ruby-dev 
